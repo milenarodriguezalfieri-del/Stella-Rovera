@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nutrir(se) — Mi diario</title>
+<link rel="stylesheet" href="css/style.css?v=10" />
+</head>
+<body>
+  <div class="shell" style="max-width: 680px;">
+    <div class="topbar">
+      <div class="brand">
+        <div>
+          <div class="brand-name">Nutrir(se)</div>
+          <div class="brand-tag" style="font-size: 16px; font-style: italic;">La alimentación saludable no empieza en el plato, empieza en la forma en que nos relacionamos con nosotros mismos.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading" class="empty-state">Buscando tu diario…</div>
+
+    <div id="not-found" class="empty-state" style="display:none;">
+      <h2 style="margin-bottom:12px;">No encontramos este link</h2>
+      <p class="muted">Puede que el código no sea correcto. Consultá con tu nutricionista para que te reenvíe el link.</p>
+    </div>
+
+    <div id="diary-view" style="display:none;">
+      <div class="title-banner">
+        <h1 style="font-family: 'Playfair Display', serif; font-weight: 400; letter-spacing: 0.005em; font-size: 30px; line-height: 1.3;">La comida y<br><em style="font-style: italic; font-weight: 400;">nuestra historia personal</em></h1>
+      </div>
+      <p style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 18px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 28px; text-align: left;">Un espacio para comprender cómo nuestra historia, las emociones, las creencias y las experiencias influyen en la forma en que elegimos comer.<br>Es vital aprender a escuchar las verdaderas necesidades del cuerpo.</p>
+
+      <hr class="section-divider" style="margin: 0 0 24px;" />
+      <p id="greeting" style="margin-bottom: 4px; font-size: 20px; font-weight: 600; color: var(--ink);"></p>
+      <p style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 16px;">Éste tipo de preguntas, nos conduce a conocernos mejor.<br>Es importante saber cuál es nuestra relación con las comidas, pues de éste modo evaluamos dónde están las conductas y hábitos que queremos cambiar.</p>
+      <p id="total-progress" class="muted" style="margin-bottom: 24px; font-size: 16px;"></p>
+
+      <div id="stage-area">
+        <div id="stage-content"></div>
+      </div>
+
+      <hr class="section-divider" style="margin: 48px 0 24px;" />
+      <p class="brand-tag" style="font-size: 16px; font-style: italic; margin-bottom: 8px;">A partir de hoy voy a cuidar mi cuerpo.</p>
+      <p style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--ink-soft); margin-bottom: 40px;">Stella Rovera — Nutricionista</p>
+    </div>
+  </div>
+
+  <script type="module" src="js/formulario.js?v=18"></script>
+</body>
+</html>
