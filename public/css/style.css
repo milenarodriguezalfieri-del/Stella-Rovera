@@ -1,24 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:wght@400;500;600&family=Newsreader:wght@300;400&family=Crimson+Pro:wght@300;400&family=Spectral:wght@300;400&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
+/*
+  Paleta e identidad — según Manual de marca Nutrir(se).
+  4 colores oficiales: beige #F6F1E7, verde #7C8660, marrón #2E2B24, rosa empolvado #C4B5A8.
+  Tipografías oficiales: DM Sans (texto/títulos) y Playfair Display (subtítulos, itálica).
+  IBM Plex Mono se mantiene solo para códigos de paciente (uso técnico, no de marca).
+*/
 :root {
-  --paper: #F6F1E7;
-  --paper-raised: #FDFBF6;
-  --ink: #2E2B24;
-  --ink-soft: #6B6659;
-  --sage: #5B6E4F;
-  --sage-deep: #3D4A35;
-  --sage-pale: #E4E9DC;
-  --gold: #C9A24B;
-  --plum: #6E4A5E;
+  /* Colores de marca */
+  --beige: #F6F1E7;
+  --beige-raised: #FDFBF6;
+  --verde: #7C8660;
+  --verde-deep: #5F6849;
+  --verde-pale: #E4E7DA;
+  --marron: #2E2B24;
+  --marron-soft: #6B6659;
+  --rosa: #C4B5A8;
+  --rosa-deep: #A8907E;
   --line: #DED5BF;
   --danger: #A6483A;
-  --olive: #7C8660;
-  --stage-bg: #979B80;
-  --stage-text: #F6F1E7;
-  --beige-border: #CBB999;
-  --beige-text: #F4EFE2;
-  --peach: #D9A47B;
-  --rosa: #C4B5A8;
+
+  /* Alias de compatibilidad (usados en el HTML/JS existente) */
+  --paper: var(--beige);
+  --paper-raised: var(--beige-raised);
+  --ink: var(--marron);
+  --ink-soft: var(--marron-soft);
+  --sage: var(--verde);
+  --sage-deep: var(--verde-deep);
+  --sage-pale: var(--verde-pale);
+  --olive: var(--verde);
+  --stage-bg: var(--verde);
+  --stage-text: var(--beige);
+  --beige-text: var(--beige);
+  --beige-border: var(--line);
 
   --radius: 6px;
   --shadow-card: 0 1px 2px rgba(46, 43, 36, 0.06), 0 4px 14px rgba(46, 43, 36, 0.05);
@@ -29,9 +43,10 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--beige);
+  color: var(--marron);
   font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
   font-size: 16px;
   line-height: 1.5;
 }
@@ -48,7 +63,7 @@ h1, h2, h3 {
   letter-spacing: 0.01em;
 }
 
-a { color: var(--sage-deep); }
+a { color: var(--verde-deep); }
 
 button, input, textarea, select {
   font-family: inherit;
@@ -68,26 +83,39 @@ button, input, textarea, select {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
   padding: 28px 0 20px;
   border-bottom: 1px solid var(--line);
   margin-bottom: 32px;
 }
 
-.brand {
+.topbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  min-height: 1px;
 }
 
-.brand-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.brand-logo {
+  height: 46px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
 }
 
 .brand-tag {
   font-size: 14px;
   color: var(--ink-soft);
   font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  font-style: italic;
 }
 
 @keyframes fadeInStage {
@@ -99,13 +127,13 @@ button, input, textarea, select {
 }
 
 .title-banner {
-  background: var(--olive);
+  background: var(--verde);
   padding: 36px 32px;
   border-radius: var(--radius);
   margin-bottom: 24px;
 }
 .title-banner h1 {
-  color: var(--beige-text);
+  color: var(--beige);
   margin-bottom: 0;
 }
 
@@ -115,35 +143,35 @@ button, input, textarea, select {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid var(--sage-deep);
-  background: var(--sage-deep);
-  color: var(--paper-raised);
+  border: 1px solid var(--verde-deep);
+  background: var(--verde-deep);
+  color: var(--beige-raised);
   padding: 10px 18px;
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 500;
   transition: transform 0.08s ease, background 0.15s ease;
 }
-.btn:hover { background: var(--sage); }
+.btn:hover { background: var(--verde); }
 .btn:active { transform: translateY(1px); }
 .btn.secondary {
   background: transparent;
-  color: var(--sage-deep);
+  color: var(--verde-deep);
 }
-.btn.secondary:hover { background: var(--sage-pale); }
+.btn.secondary:hover { background: var(--verde-pale); }
 .btn.ghost {
   background: transparent;
   border-color: transparent;
   color: var(--ink-soft);
   padding: 6px 10px;
 }
-.btn.ghost:hover { background: var(--sage-pale); color: var(--sage-deep); }
+.btn.ghost:hover { background: var(--verde-pale); color: var(--verde-deep); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ---------- Cards ---------- */
 
 .card {
-  background: var(--paper-raised);
+  background: var(--beige-raised);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
@@ -153,7 +181,7 @@ button, input, textarea, select {
 .card.stage-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 10px rgba(46, 43, 36, 0.10), 0 8px 20px rgba(46, 43, 36, 0.08);
-  background-color: #E7DAC0;
+  background-color: var(--rosa);
 }
 
 #stage-area {
@@ -186,7 +214,7 @@ input[type="password"],
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  background: var(--paper);
+  background: var(--beige);
   border-radius: var(--radius);
   padding: 11px 13px;
   margin-bottom: 18px;
@@ -210,10 +238,10 @@ textarea { resize: vertical; min-height: 80px; }
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--beige);
   cursor: pointer;
 }
-.choice-row:hover { border-color: var(--sage); }
+.choice-row:hover { border-color: var(--verde); }
 .choice-row input { margin-top: 3px; }
 
 /* ---------- Patient list / index cards ---------- */
@@ -230,13 +258,13 @@ textarea { resize: vertical; min-height: 80px; }
   gap: 12px;
   flex-wrap: wrap;
   padding: 14px 16px;
-  background: var(--paper-raised);
+  background: var(--beige-raised);
   border: 1px solid var(--line);
   border-radius: var(--radius);
 }
 .patient-row.active {
-  border-color: var(--sage);
-  box-shadow: 0 0 0 1px var(--sage);
+  border-color: var(--verde);
+  box-shadow: 0 0 0 1px var(--verde);
 }
 .patient-name { font-weight: 500; }
 .patient-code { font-size: 12px; color: var(--ink-soft); }
@@ -246,8 +274,8 @@ textarea { resize: vertical; min-height: 80px; }
   font-size: 13px;
   padding: 3px 9px;
   border-radius: 3px;
-  background: var(--sage-pale);
-  color: var(--sage-deep);
+  background: var(--verde-pale);
+  color: var(--verde-deep);
   font-family: 'DM Sans', sans-serif;
   font-weight: 500;
 }
@@ -283,7 +311,7 @@ textarea { resize: vertical; min-height: 80px; }
 .section-letter {
   font-family: 'Playfair Display', serif;
   font-size: 28px;
-  color: var(--gold);
+  color: var(--verde);
 }
 .section-title {
   font-family: 'Playfair Display', serif;
@@ -306,7 +334,7 @@ textarea { resize: vertical; min-height: 80px; }
 .question-hint {
   font-size: 17px;
   font-weight: 700;
-  color: #2E2B24;
+  color: var(--marron);
   margin-top: -6px;
   margin-bottom: 10px;
 }
@@ -327,8 +355,8 @@ textarea { resize: vertical; min-height: 80px; }
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--sage-deep);
-  color: var(--paper-raised);
+  background: var(--verde-deep);
+  color: var(--beige-raised);
   padding: 12px 20px;
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);

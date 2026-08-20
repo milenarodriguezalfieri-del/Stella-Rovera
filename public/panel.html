@@ -4,16 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nutrir(se) — Panel</title>
-<link rel="stylesheet" href="css/style.css?v=10" />
+<link rel="icon" type="image/png" href="favicon-32.png" />
+<link rel="apple-touch-icon" href="assets/logo/apple-touch-icon.png" />
+<link rel="stylesheet" href="css/style.css?v=17" />
 </head>
 <body>
   <div class="shell" style="max-width: 720px;">
     <div class="topbar">
       <div class="brand">
-        <div>
-          <div class="brand-name">Nutrir(se)</div>
-          <div class="brand-tag">panel — Stella Rovera</div>
-        </div>
+        <img src="assets/logo/wordmark-dark.png" alt="Nutrir(se)" class="brand-logo" />
+        <div class="brand-tag">panel — Stella Rovera</div>
       </div>
       <button class="btn ghost" id="logout-btn" style="display:none;">Cerrar sesión</button>
     </div>
@@ -36,7 +36,7 @@
     <!-- HOME: lista de pacientes -->
     <div id="dashboard-view" style="display:none;">
       <div class="row between" style="margin-bottom: 20px;">
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 300; text-transform: uppercase; letter-spacing: 0.03em;">Pacientes</h2>
+        <h2 style="font-family: 'Playfair Display', serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em;">Pacientes</h2>
         <button class="btn" id="show-new-patient-btn">Añadir paciente</button>
       </div>
 
@@ -55,6 +55,11 @@
       <div id="patient-list" class="patient-list">
         <p class="muted">Cargando…</p>
       </div>
+    </div>
+
+    <hr class="section-divider" style="margin: 56px 0 40px;" />
+    <div style="text-align: center; margin-top: 32px; margin-bottom: 8px;">
+      <img src="assets/logo/isologo-name.png" alt="Nutrir(se) — Stella Rovera, Lic. en Nutrición" style="width: 80px; height: auto;" />
     </div>
   </div>
 
