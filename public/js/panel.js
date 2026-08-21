@@ -104,11 +104,7 @@ async function loadPatients() {
     row.appendChild(info);
 
     const actions = document.createElement('div');
-    actions.className = 'row';
-    actions.style.gap = '6px';
-    actions.style.flexWrap = 'nowrap';
-    actions.style.overflowX = 'auto';
-    actions.style.paddingBottom = '2px';
+    actions.className = 'row patient-actions';
 
     const copyBtn = document.createElement('button');
     copyBtn.type = 'button';
