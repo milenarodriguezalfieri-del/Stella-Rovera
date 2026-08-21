@@ -102,12 +102,22 @@ function renderAlimentosSection() {
   saveStatus.style.minHeight = '18px';
   el.sectionAlimentos.appendChild(saveStatus);
 
-  const flagSaving = () => { saveStatus.textContent = 'Guardando…'; };
+  const flagSaving = () => {
+    saveStatus.textContent = 'Guardando…';
+    if (el.bottomSaveStatus) el.bottomSaveStatus.textContent = 'Guardando…';
+  };
   const flagSaved = async () => {
     const ok = await saveFoodPlan();
-    saveStatus.textContent = ok ? 'Cambios guardados ✓' : 'No se pudo guardar. Probá de nuevo.';
-    if (ok) setTimeout(() => { if (saveStatus.textContent === 'Cambios guardados ✓') saveStatus.textContent = ''; }, 2000);
+    const msg = ok ? 'Cambios guardados ✓' : 'No se pudo guardar. Probá de nuevo.';
+    saveStatus.textContent = msg;
+    if (el.bottomSaveStatus) el.bottomSaveStatus.textContent = msg;
+    if (ok) setTimeout(() => {
+      if (saveStatus.textContent === 'Cambios guardados ✓') saveStatus.textContent = '';
+      if (el.bottomSaveStatus && el.bottomSaveStatus.textContent === 'Cambios guardados ✓') el.bottomSaveStatus.textContent = '';
+    }, 2000);
   };
+
+  const allNotesAreas = [];
 
   for (const group of FOOD_GROUPS) {
     const groupCard = document.createElement('div');
@@ -199,12 +209,14 @@ function renderAlimentosSection() {
     const notesArea = document.createElement('textarea');
     notesArea.rows = 2;
     notesArea.value = foodNotes[group.id] || '';
+    notesArea.dataset.notesKey = group.id;
     notesArea.addEventListener('blur', () => {
       foodNotes[group.id] = notesArea.value.trim();
       flagSaving();
       flagSaved();
     });
     groupCard.appendChild(notesArea);
+    allNotesAreas.push(notesArea);
 
     el.sectionAlimentos.appendChild(groupCard);
   }
@@ -225,14 +237,38 @@ function renderAlimentosSection() {
   generalNotesArea.rows = 4;
   generalNotesArea.placeholder = 'Indicaciones generales del plan, aclaraciones, recomendaciones…';
   generalNotesArea.value = foodNotes.general || '';
+  generalNotesArea.dataset.notesKey = 'general';
   generalNotesArea.addEventListener('blur', () => {
     foodNotes.general = generalNotesArea.value.trim();
     flagSaving();
     flagSaved();
   });
   generalCard.appendChild(generalNotesArea);
+  allNotesAreas.push(generalNotesArea);
 
   el.sectionAlimentos.appendChild(generalCard);
+
+  const saveBtn = document.createElement('button');
+  saveBtn.type = 'button';
+  saveBtn.className = 'btn';
+  saveBtn.textContent = 'Guardar';
+  saveBtn.style.display = 'block';
+  saveBtn.style.margin = '8px auto 4px';
+  saveBtn.addEventListener('click', () => {
+    for (const area of allNotesAreas) {
+      foodNotes[area.dataset.notesKey] = area.value.trim();
+    }
+    flagSaving();
+    flagSaved();
+  });
+  el.sectionAlimentos.appendChild(saveBtn);
+
+  el.bottomSaveStatus = document.createElement('div');
+  el.bottomSaveStatus.className = 'muted';
+  el.bottomSaveStatus.style.fontSize = '13px';
+  el.bottomSaveStatus.style.textAlign = 'center';
+  el.bottomSaveStatus.style.minHeight = '18px';
+  el.sectionAlimentos.appendChild(el.bottomSaveStatus);
 }
 
 function setActiveSection(section) {
