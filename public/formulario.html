@@ -31,13 +31,21 @@
       <p style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 18px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 28px; text-align: left;">Un espacio para comprender cómo nuestra historia, las emociones, las creencias y las experiencias influyen en la forma en que elegimos comer.<br>Es vital aprender a escuchar las verdaderas necesidades del cuerpo.</p>
 
       <hr class="section-divider" style="margin: 0 0 24px;" />
-      <p id="greeting" style="margin-bottom: 4px; font-size: 20px; font-weight: 600; color: var(--ink);"></p>
-      <p style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 16px;">Éste tipo de preguntas, nos conduce a conocernos mejor.<br>Es importante saber cuál es nuestra relación con las comidas, pues de éste modo evaluamos dónde están las conductas y hábitos que queremos cambiar.</p>
-      <p id="total-progress" class="muted" style="margin-bottom: 24px; font-size: 16px;"></p>
+      <p id="greeting" style="margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--ink);"></p>
 
-      <div id="stage-area">
-        <div id="stage-content"></div>
+      <div id="section-chooser"></div>
+
+      <div id="section-habitos" style="display:none;">
+        <button type="button" id="back-to-chooser-btn" class="btn ghost no-print" style="margin-bottom: 20px; display:none;">← Volver a las secciones</button>
+        <p style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin-bottom: 16px;">Éste tipo de preguntas, nos conduce a conocernos mejor.<br>Es importante saber cuál es nuestra relación con las comidas, pues de éste modo evaluamos dónde están las conductas y hábitos que queremos cambiar.</p>
+        <p id="total-progress" class="muted" style="margin-bottom: 24px; font-size: 16px;"></p>
+
+        <div id="stage-area">
+          <div id="stage-content"></div>
+        </div>
       </div>
+
+      <div id="section-alimentos" style="display:none;"></div>
 
       <hr class="section-divider" style="margin: 48px 0 40px;" />
       <p class="brand-tag" style="font-size: 16px; margin-bottom: 20px; text-align: center;">A partir de hoy voy a cuidar mi cuerpo.</p>
@@ -47,6 +55,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/formulario.js?v=18"></script>
+  <script type="module" src="js/formulario.js?v=19"></script>
 </body>
 </html>

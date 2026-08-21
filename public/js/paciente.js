@@ -4,6 +4,7 @@ import { STAGES } from './stages.js?v=2';
 const params = new URLSearchParams(window.location.search);
 const patientId = params.get('id');
 const printMode = params.get('print') === '1';
+const requestedSection = params.get('section');
 
 const el = {
   loading: document.getElementById('loading'),
@@ -13,10 +14,15 @@ const el = {
   totalProgress: document.getElementById('total-progress'),
   stageArea: document.getElementById('stage-area'),
   stageDetail: document.getElementById('stage-detail'),
+  sectionTabs: document.getElementById('section-tabs'),
+  sectionHabitos: document.getElementById('section-habitos'),
+  sectionAlimentos: document.getElementById('section-alimentos'),
 };
 
 let entryMap = {};
 let activeStage = 1;
+let patientTrackingType = 'alimentos_habitos';
+let activeSection = 'habitos';
 
 function capitalizeWords(str) {
   return (str || '')
@@ -42,6 +48,45 @@ async function requireSession() {
 function answeredCountFor(stageNumber) {
   const stage = STAGES.find((s) => s.stage === stageNumber);
   return stage.days.filter((d) => entryMap[`${stageNumber}-${d.day}`]?.answer).length;
+}
+
+function renderSectionTabs() {
+  el.sectionTabs.innerHTML = '';
+
+  const habitosBtn = document.createElement('button');
+  habitosBtn.type = 'button';
+  habitosBtn.className = 'btn' + (activeSection === 'habitos' ? '' : ' secondary');
+  habitosBtn.textContent = 'Hábitos';
+  habitosBtn.disabled = patientTrackingType !== 'alimentos_habitos';
+  habitosBtn.addEventListener('click', () => setActiveSection('habitos'));
+  el.sectionTabs.appendChild(habitosBtn);
+
+  const alimentosBtn = document.createElement('button');
+  alimentosBtn.type = 'button';
+  alimentosBtn.className = 'btn' + (activeSection === 'alimentos' ? '' : ' secondary');
+  alimentosBtn.textContent = 'Selección de alimentos';
+  alimentosBtn.addEventListener('click', () => setActiveSection('alimentos'));
+  el.sectionTabs.appendChild(alimentosBtn);
+}
+
+function renderAlimentosSection() {
+  el.sectionAlimentos.innerHTML = `
+    <div class="card empty-state">
+      <h3 style="margin-bottom: 10px;">Selección de alimentos</h3>
+      <p class="muted">Esta sección está en construcción. Pronto vas a poder armar acá la selección de alimentos personalizada para esta paciente.</p>
+    </div>
+  `;
+}
+
+function setActiveSection(section) {
+  activeSection = section;
+  el.sectionHabitos.style.display = section === 'habitos' ? 'block' : 'none';
+  el.sectionAlimentos.style.display = section === 'alimentos' ? 'block' : 'none';
+  renderSectionTabs();
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('section', section);
+  window.history.replaceState({}, '', url);
 }
 
 function renderStageCards() {
@@ -178,7 +223,7 @@ async function init() {
 
   const { data: patient, error: patientError } = await supabase
     .from('patients')
-    .select('id, name, code, created_at')
+    .select('id, name, code, created_at, tracking_type')
     .eq('id', patientId)
     .single();
 
@@ -186,6 +231,8 @@ async function init() {
     el.loading.textContent = 'No se encontró esta paciente.';
     return;
   }
+
+  patientTrackingType = patient.tracking_type || 'alimentos_habitos';
 
   el.patientLabel.textContent = `Paciente ${capitalizeWords(patient.name)}`;
   el.patientSince.textContent = `Paciente desde ${formatDate(patient.created_at)}`;
@@ -207,6 +254,12 @@ async function init() {
 
   renderStageCards();
   renderStageDetail();
+  renderAlimentosSection();
+
+  const initialSection = requestedSection === 'alimentos' || patientTrackingType !== 'alimentos_habitos'
+    ? 'alimentos'
+    : 'habitos';
+  setActiveSection(initialSection);
 
   el.loading.style.display = 'none';
   el.content.style.display = 'block';

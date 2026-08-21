@@ -12,11 +12,16 @@ const el = {
   totalProgress: document.getElementById('total-progress'),
   stageArea: document.getElementById('stage-area'),
   stageContent: document.getElementById('stage-content'),
+  sectionChooser: document.getElementById('section-chooser'),
+  sectionHabitos: document.getElementById('section-habitos'),
+  sectionAlimentos: document.getElementById('section-alimentos'),
+  backToChooserBtn: document.getElementById('back-to-chooser-btn'),
 };
 
 let patient = null;
 let entryMap = {}; // "stage-day" -> { answer, answered_at }
 let activeStage = 1;
+let activeSection = null; // null = chooser, 'habitos', 'alimentos'
 
 function show(node) {
   [el.loading, el.notFound, el.diaryView].forEach((n) => (n.style.display = 'none'));
@@ -45,6 +50,80 @@ function stageIsUnlocked(stageNumber) {
     if (!stageIsComplete(s)) return false;
   }
   return true;
+}
+
+function hasBothSections() {
+  return patient.tracking_type === 'alimentos_habitos';
+}
+
+function sectionTile({ title, description }) {
+  const tile = document.createElement('div');
+  tile.className = 'card stage-card';
+  tile.style.cursor = 'pointer';
+  tile.style.textAlign = 'center';
+  tile.style.padding = '32px 20px';
+  tile.style.background = 'var(--stage-bg)';
+  tile.style.border = 'none';
+  tile.innerHTML = `
+    <div style="font-family:'Playfair Display',serif; font-weight:400; font-size:21px; color:var(--stage-text); margin-bottom:10px;">${title}</div>
+    <div style="font-family:'DM Sans',sans-serif; font-weight:300; font-size:14px; line-height:1.5; color:var(--stage-text); opacity:0.9;">${description}</div>
+  `;
+  return tile;
+}
+
+function renderSectionChooser() {
+  el.sectionChooser.innerHTML = '';
+
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = hasBothSections() ? 'repeat(2, 1fr)' : '1fr';
+  grid.style.gap = '14px';
+  grid.style.marginBottom = '32px';
+
+  const alimentosTile = sectionTile({
+    title: 'Selección de alimentos',
+    description: 'Tu guía personalizada de alimentos, armada junto a Stella.',
+  });
+  alimentosTile.addEventListener('click', () => setActiveSection('alimentos'));
+  grid.appendChild(alimentosTile);
+
+  if (hasBothSections()) {
+    const habitosTile = sectionTile({
+      title: 'Hábitos',
+      description: 'Tu diario de 21 días para reconocer y transformar tu relación con la comida.',
+    });
+    habitosTile.addEventListener('click', () => setActiveSection('habitos'));
+    grid.appendChild(habitosTile);
+  }
+
+  el.sectionChooser.appendChild(grid);
+}
+
+function renderAlimentosSection() {
+  el.sectionAlimentos.innerHTML = `
+    ${hasBothSections() ? '<button type="button" class="btn ghost no-print" id="back-to-chooser-btn-alimentos" style="margin-bottom: 20px;">← Volver a las secciones</button>' : ''}
+    <div class="card empty-state">
+      <h3 style="margin-bottom: 10px;">Selección de alimentos</h3>
+      <p class="muted">Esta sección está en construcción. Pronto vas a poder ver acá tu selección de alimentos personalizada.</p>
+    </div>
+  `;
+  const backBtn = document.getElementById('back-to-chooser-btn-alimentos');
+  if (backBtn) backBtn.addEventListener('click', () => setActiveSection(null));
+}
+
+function setActiveSection(section) {
+  activeSection = section;
+  el.sectionChooser.style.display = section === null ? 'block' : 'none';
+  el.sectionHabitos.style.display = section === 'habitos' ? 'block' : 'none';
+  el.sectionAlimentos.style.display = section === 'alimentos' ? 'block' : 'none';
+
+  if (section === 'habitos') {
+    el.backToChooserBtn.style.display = hasBothSections() ? 'inline-flex' : 'none';
+  }
+
+  if (section !== null) {
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }
 }
 
 function renderStageCards() {
@@ -403,8 +482,15 @@ async function init() {
   el.greeting.textContent = `Hola ${capitalizeWords(patient.name)}, este espacio es solo tuyo.`;
   const totalAnswered = STAGES.reduce((sum, s) => sum + s.days.filter((d) => (entryMap[`${s.stage}-${d.day}`]?.answer || '').trim().length > 0).length, 0);
   el.totalProgress.textContent = `${totalAnswered} de 21 días completados`;
+
+  el.backToChooserBtn.addEventListener('click', () => setActiveSection(null));
+
+  renderSectionChooser();
+  renderAlimentosSection();
   renderStageCards();
   renderStage();
+  setActiveSection(null);
+
   show(el.diaryView);
 }
 

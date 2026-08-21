@@ -58,7 +58,7 @@ async function loadPatients() {
   el.patientList.innerHTML = '<p class="muted">Cargando…</p>';
   const { data, error } = await supabase
     .from('patients')
-    .select('id, name, code, created_at')
+    .select('id, name, code, created_at, tracking_type')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -93,13 +93,16 @@ async function loadPatients() {
 
     const info = document.createElement('div');
     const hasAnswers = patientsWithAnswers.has(patient.id);
+    const trackingLabel = patient.tracking_type === 'alimentos'
+      ? 'Selección de alimentos'
+      : 'Selección de alimentos + hábitos';
     info.innerHTML = `
       <div class="patient-name">${capitalizeWords(patient.name)}</div>
-      ${
-        hasAnswers
-          ? `<div class="pill" style="margin-top:4px;">Nueva respuesta</div>`
-          : `<div class="patient-code mono">${patient.code}</div>`
-      }
+      <div class="row" style="gap:8px; margin-top:4px; flex-wrap:wrap;">
+        <span class="pill" style="background:var(--rosa); color:var(--marron);">${trackingLabel}</span>
+        ${hasAnswers ? `<span class="pill">Nueva respuesta</span>` : ''}
+      </div>
+      <div class="patient-code mono" style="margin-top:4px;">${patient.code}</div>
     `;
     row.appendChild(info);
 
@@ -120,14 +123,25 @@ async function loadPatients() {
     });
     actions.appendChild(copyBtn);
 
-    const fichaBtn = document.createElement('button');
-    fichaBtn.type = 'button';
-    fichaBtn.className = 'btn secondary';
-    fichaBtn.textContent = 'Ficha';
-    fichaBtn.addEventListener('click', () => {
-      window.location.href = `paciente.html?id=${patient.id}`;
+    const alimentosBtn = document.createElement('button');
+    alimentosBtn.type = 'button';
+    alimentosBtn.className = 'btn secondary';
+    alimentosBtn.textContent = 'Selección de alimentos';
+    alimentosBtn.addEventListener('click', () => {
+      window.location.href = `paciente.html?id=${patient.id}&section=alimentos`;
     });
-    actions.appendChild(fichaBtn);
+    actions.appendChild(alimentosBtn);
+
+    if (patient.tracking_type === 'alimentos_habitos') {
+      const habitosBtn = document.createElement('button');
+      habitosBtn.type = 'button';
+      habitosBtn.className = 'btn secondary';
+      habitosBtn.textContent = 'Hábitos';
+      habitosBtn.addEventListener('click', () => {
+        window.location.href = `paciente.html?id=${patient.id}&section=habitos`;
+      });
+      actions.appendChild(habitosBtn);
+    }
 
     const printBtn = document.createElement('button');
     printBtn.type = 'button';
@@ -204,8 +218,11 @@ el.newPatientForm.addEventListener('submit', async (e) => {
   const name = nameInput.value.trim();
   if (!name) return;
 
+  const trackingInput = el.newPatientForm.querySelector('input[name="tracking-type"]:checked');
+  const trackingType = trackingInput ? trackingInput.value : 'alimentos_habitos';
+
   const code = generateCode(name);
-  const { error } = await supabase.from('patients').insert({ name, code });
+  const { error } = await supabase.from('patients').insert({ name, code, tracking_type: trackingType });
 
   if (error) {
     alert('No se pudo crear la paciente. Probá de nuevo.');

@@ -24,8 +24,24 @@ create table if not exists patients (
   name text not null,
   code text not null unique,
   notes text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  tracking_type text not null default 'alimentos_habitos'
+    check (tracking_type in ('alimentos', 'alimentos_habitos'))
 );
+
+-- Si la tabla ya existía de una versión anterior de este esquema,
+-- esto agrega la columna sin romper nada:
+alter table patients add column if not exists tracking_type text
+  not null default 'alimentos_habitos';
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'patients_tracking_type_check'
+  ) then
+    alter table patients add constraint patients_tracking_type_check
+      check (tracking_type in ('alimentos', 'alimentos_habitos'));
+  end if;
+end $$;
 
 -- ---------------------------------------------------------
 -- Tabla del diario: 3 etapas ("stage" 1-3), 7 días cada una
@@ -82,12 +98,12 @@ create policy "anon_update_entries" on diary_entries
 -- (Devuelve solo id y nombre, nunca la lista completa de pacientes)
 -- ---------------------------------------------------------
 create or replace function get_patient_by_code(p_code text)
-returns table (id uuid, name text)
+returns table (id uuid, name text, tracking_type text)
 language sql
 security definer
 set search_path = public
 as $$
-  select id, name from patients where code = p_code;
+  select id, name, tracking_type from patients where code = p_code;
 $$;
 
 grant execute on function get_patient_by_code(text) to anon;
