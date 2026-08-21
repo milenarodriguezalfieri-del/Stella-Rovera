@@ -151,6 +151,11 @@ async function loadPatients() {
       actions.appendChild(habitosBtn);
     }
 
+    const secondaryActions = document.createElement('div');
+    secondaryActions.className = 'row';
+    secondaryActions.style.gap = '6px';
+    secondaryActions.style.marginTop = '10px';
+
     const printBtn = document.createElement('button');
     printBtn.type = 'button';
     printBtn.className = 'btn ghost';
@@ -158,7 +163,7 @@ async function loadPatients() {
     printBtn.addEventListener('click', () => {
       window.open(`paciente.html?id=${patient.id}&print=1`, '_blank');
     });
-    actions.appendChild(printBtn);
+    secondaryActions.appendChild(printBtn);
 
     const deleteBtn = document.createElement('button');
     deleteBtn.type = 'button';
@@ -183,9 +188,10 @@ async function loadPatients() {
 
       loadPatients();
     });
-    actions.appendChild(deleteBtn);
+    secondaryActions.appendChild(deleteBtn);
 
     row.appendChild(actions);
+    row.appendChild(secondaryActions);
     el.patientList.appendChild(row);
   }
 }
