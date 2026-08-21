@@ -105,8 +105,10 @@ async function loadPatients() {
 
     const actions = document.createElement('div');
     actions.className = 'row';
-    actions.style.gap = '8px';
-    actions.style.flexWrap = 'wrap';
+    actions.style.gap = '6px';
+    actions.style.flexWrap = 'nowrap';
+    actions.style.overflowX = 'auto';
+    actions.style.paddingBottom = '2px';
 
     const copyBtn = document.createElement('button');
     copyBtn.type = 'button';
