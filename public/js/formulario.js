@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES } from './stages.js?v=2';
+import { FOOD_GROUPS } from './foodGroups.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const code = params.get('code');
@@ -22,6 +23,8 @@ let patient = null;
 let entryMap = {}; // "stage-day" -> { answer, answered_at }
 let activeStage = 1;
 let activeSection = null; // null = chooser, 'habitos', 'alimentos'
+let foodSelections = {};
+let foodNotes = {};
 
 function show(node) {
   [el.loading, el.notFound, el.diaryView].forEach((n) => (n.style.display = 'none'));
@@ -100,15 +103,89 @@ function renderSectionChooser() {
 }
 
 function renderAlimentosSection() {
-  el.sectionAlimentos.innerHTML = `
-    ${hasBothSections() ? '<button type="button" class="btn ghost no-print" id="back-to-chooser-btn-alimentos" style="margin-bottom: 20px;">← Volver a las secciones</button>' : ''}
-    <div class="card empty-state">
+  el.sectionAlimentos.innerHTML = '';
+
+  if (hasBothSections()) {
+    const backBtn = document.createElement('button');
+    backBtn.type = 'button';
+    backBtn.className = 'btn ghost no-print';
+    backBtn.style.marginBottom = '20px';
+    backBtn.textContent = '← Volver a las secciones';
+    backBtn.addEventListener('click', () => setActiveSection(null));
+    el.sectionAlimentos.appendChild(backBtn);
+  }
+
+  const anySelected = FOOD_GROUPS.some((group) => group.items.some((item) => (foodSelections[item.id] || []).length > 0));
+
+  if (!anySelected) {
+    const empty = document.createElement('div');
+    empty.className = 'card empty-state';
+    empty.innerHTML = `
       <h3 style="margin-bottom: 10px;">Selección de alimentos</h3>
-      <p class="muted">Esta sección está en construcción. Pronto vas a poder ver acá tu selección de alimentos personalizada.</p>
-    </div>
+      <p class="muted">Tu nutricionista todavía no cargó tu selección de alimentos. Pronto vas a ver acá el detalle de tu plan.</p>
+    `;
+    el.sectionAlimentos.appendChild(empty);
+    return;
+  }
+
+  const header = document.createElement('div');
+  header.style.marginBottom = '28px';
+  header.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">Selección de alimentos</h3>
+    <p class="muted" style="margin-bottom:16px;">Fecha de creación: ${patient.created_at ? formatDate(patient.created_at) : ''}</p>
+    <p style="font-style: italic; font-weight: 400; color: var(--sage-deep); font-size: 19px; margin-bottom: 6px;">Alimentos que componen el plan de alimentación</p>
+    <p style="font-family:'DM Sans',sans-serif; font-style:normal; font-size:16px; font-weight:300; line-height:1.6; color:var(--ink-soft);">Cantidad total por día y formas de preparación:</p>
   `;
-  const backBtn = document.getElementById('back-to-chooser-btn-alimentos');
-  if (backBtn) backBtn.addEventListener('click', () => setActiveSection(null));
+  el.sectionAlimentos.appendChild(header);
+
+  for (const group of FOOD_GROUPS) {
+    const groupItems = group.items.filter((item) => (foodSelections[item.id] || []).length > 0);
+    const groupNote = (foodNotes[group.id] || '').trim();
+    if (groupItems.length === 0 && !groupNote) continue;
+
+    const groupCard = document.createElement('div');
+    groupCard.className = 'card';
+    groupCard.style.marginBottom = '20px';
+
+    const groupTitle = document.createElement('div');
+    groupTitle.style.fontFamily = "'DM Sans', sans-serif";
+    groupTitle.style.fontWeight = '700';
+    groupTitle.style.fontSize = '18px';
+    groupTitle.style.marginBottom = '12px';
+    groupTitle.textContent = group.name;
+    groupCard.appendChild(groupTitle);
+
+    for (const item of groupItems) {
+      const itemBlock = document.createElement('div');
+      itemBlock.style.marginBottom = '12px';
+
+      const itemLabel = document.createElement('div');
+      itemLabel.style.fontWeight = '500';
+      itemLabel.style.marginBottom = '4px';
+      itemLabel.textContent = item.name;
+      itemBlock.appendChild(itemLabel);
+
+      const list = document.createElement('div');
+      list.style.fontSize = '14px';
+      list.style.color = 'var(--ink-soft)';
+      list.textContent = foodSelections[item.id].join(', ');
+      itemBlock.appendChild(list);
+
+      groupCard.appendChild(itemBlock);
+    }
+
+    if (groupNote) {
+      const noteBlock = document.createElement('div');
+      noteBlock.style.marginTop = '10px';
+      noteBlock.style.fontSize = '13px';
+      noteBlock.style.fontStyle = 'italic';
+      noteBlock.style.color = 'var(--ink-soft)';
+      noteBlock.textContent = groupNote;
+      groupCard.appendChild(noteBlock);
+    }
+
+    el.sectionAlimentos.appendChild(groupCard);
+  }
 }
 
 function setActiveSection(section) {
@@ -476,6 +553,11 @@ async function init() {
   for (const e of entries || []) {
     entryMap[`${e.stage}-${e.day}`] = { answer: e.answer, answered_at: e.answered_at };
   }
+
+  const { data: foodPlanRows } = await supabase.rpc('get_patient_food_plan', { p_code: code });
+  const foodPlan = foodPlanRows && foodPlanRows[0];
+  foodSelections = foodPlan?.selections || {};
+  foodNotes = foodPlan?.notes || {};
 
   activeStage = STAGES.find((s) => !stageIsComplete(s.stage) && stageIsUnlocked(s.stage))?.stage || 1;
 

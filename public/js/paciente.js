@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES } from './stages.js?v=2';
+import { FOOD_GROUPS } from './foodGroups.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const patientId = params.get('id');
@@ -23,6 +24,9 @@ let entryMap = {};
 let activeStage = 1;
 let patientTrackingType = 'alimentos_habitos';
 let activeSection = 'habitos';
+let foodSelections = {};
+let foodNotes = {};
+let patientCreatedAtLabel = '';
 
 function capitalizeWords(str) {
   return (str || '')
@@ -69,13 +73,126 @@ function renderSectionTabs() {
   el.sectionTabs.appendChild(alimentosBtn);
 }
 
+async function saveFoodPlan() {
+  const { error } = await supabase.from('patient_food_plan').upsert(
+    [{ patient_id: patientId, selections: foodSelections, notes: foodNotes, updated_at: new Date().toISOString() }],
+    { onConflict: 'patient_id' }
+  );
+  return !error;
+}
+
 function renderAlimentosSection() {
-  el.sectionAlimentos.innerHTML = `
-    <div class="card empty-state">
-      <h3 style="margin-bottom: 10px;">Selección de alimentos</h3>
-      <p class="muted">Esta sección está en construcción. Pronto vas a poder armar acá la selección de alimentos personalizada para esta paciente.</p>
-    </div>
+  el.sectionAlimentos.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.style.marginBottom = '28px';
+  header.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">Selección de alimentos</h3>
+    <p class="muted" style="margin-bottom:16px;">Fecha de creación: ${patientCreatedAtLabel}</p>
+    <p style="font-style: italic; font-weight: 400; color: var(--sage-deep); font-size: 19px; margin-bottom: 6px;">Alimentos que componen el plan de alimentación</p>
+    <p style="font-family:'DM Sans',sans-serif; font-style:normal; font-size:16px; font-weight:300; line-height:1.6; color:var(--ink-soft);">Cantidad total por día y formas de preparación:</p>
   `;
+  el.sectionAlimentos.appendChild(header);
+
+  const saveStatus = document.createElement('div');
+  saveStatus.id = 'food-save-status';
+  saveStatus.className = 'muted';
+  saveStatus.style.fontSize = '13px';
+  saveStatus.style.marginBottom = '20px';
+  saveStatus.style.minHeight = '18px';
+  el.sectionAlimentos.appendChild(saveStatus);
+
+  const flagSaving = () => { saveStatus.textContent = 'Guardando…'; };
+  const flagSaved = async () => {
+    const ok = await saveFoodPlan();
+    saveStatus.textContent = ok ? 'Cambios guardados ✓' : 'No se pudo guardar. Probá de nuevo.';
+    if (ok) setTimeout(() => { if (saveStatus.textContent === 'Cambios guardados ✓') saveStatus.textContent = ''; }, 2000);
+  };
+
+  for (const group of FOOD_GROUPS) {
+    const groupCard = document.createElement('div');
+    groupCard.className = 'card';
+    groupCard.style.marginBottom = '20px';
+
+    const groupTitle = document.createElement('div');
+    groupTitle.style.fontFamily = "'DM Sans', sans-serif";
+    groupTitle.style.fontWeight = '700';
+    groupTitle.style.fontSize = '18px';
+    groupTitle.style.marginBottom = '4px';
+    groupTitle.textContent = group.name;
+    groupCard.appendChild(groupTitle);
+
+    if (group.note) {
+      const noteEl = document.createElement('p');
+      noteEl.className = 'muted';
+      noteEl.style.fontSize = '13px';
+      noteEl.style.fontStyle = 'italic';
+      noteEl.style.marginBottom = '12px';
+      noteEl.textContent = group.note;
+      groupCard.appendChild(noteEl);
+    }
+
+    for (const item of group.items) {
+      const itemBlock = document.createElement('div');
+      itemBlock.style.marginBottom = '16px';
+
+      const itemLabel = document.createElement('div');
+      itemLabel.style.fontWeight = '500';
+      itemLabel.style.marginBottom = '6px';
+      itemLabel.textContent = item.name;
+      itemBlock.appendChild(itemLabel);
+
+      const optionsWrap = document.createElement('div');
+      optionsWrap.style.display = 'flex';
+      optionsWrap.style.flexWrap = 'wrap';
+      optionsWrap.style.gap = '8px 16px';
+
+      for (const option of item.options) {
+        const optLabel = document.createElement('label');
+        optLabel.style.display = 'flex';
+        optLabel.style.alignItems = 'center';
+        optLabel.style.gap = '6px';
+        optLabel.style.fontSize = '14px';
+        optLabel.style.marginBottom = '0';
+        optLabel.style.cursor = 'pointer';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = (foodSelections[item.id] || []).includes(option);
+        checkbox.addEventListener('change', () => {
+          const current = new Set(foodSelections[item.id] || []);
+          if (checkbox.checked) current.add(option); else current.delete(option);
+          foodSelections[item.id] = Array.from(current);
+          flagSaving();
+          flagSaved();
+        });
+
+        optLabel.appendChild(checkbox);
+        optLabel.appendChild(document.createTextNode(option));
+        optionsWrap.appendChild(optLabel);
+      }
+
+      itemBlock.appendChild(optionsWrap);
+      groupCard.appendChild(itemBlock);
+    }
+
+    const notesLabel = document.createElement('label');
+    notesLabel.style.marginTop = '10px';
+    notesLabel.textContent = 'Cantidad total por día y notas de preparación';
+    groupCard.appendChild(notesLabel);
+
+    const notesArea = document.createElement('textarea');
+    notesArea.rows = 2;
+    notesArea.value = foodNotes[group.id] || '';
+    notesArea.addEventListener('blur', () => {
+      foodNotes[group.id] = notesArea.value.trim();
+      flagSaving();
+      flagSaved();
+    });
+    groupCard.appendChild(notesArea);
+
+    el.sectionAlimentos.appendChild(groupCard);
+  }
 }
 
 function setActiveSection(section) {
@@ -233,9 +350,19 @@ async function init() {
   }
 
   patientTrackingType = patient.tracking_type || 'alimentos_habitos';
+  patientCreatedAtLabel = formatDate(patient.created_at);
 
   el.patientLabel.textContent = `Paciente ${capitalizeWords(patient.name)}`;
   el.patientSince.textContent = `Paciente desde ${formatDate(patient.created_at)}`;
+
+  const { data: foodPlan } = await supabase
+    .from('patient_food_plan')
+    .select('selections, notes')
+    .eq('patient_id', patientId)
+    .maybeSingle();
+
+  foodSelections = foodPlan?.selections || {};
+  foodNotes = foodPlan?.notes || {};
 
   const { data: entries, error: entriesError } = await supabase
     .from('diary_entries')

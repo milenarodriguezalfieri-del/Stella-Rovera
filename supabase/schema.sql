@@ -94,19 +94,65 @@ create policy "anon_update_entries" on diary_entries
   with check (true);
 
 -- ---------------------------------------------------------
--- Función segura: buscar paciente por código de link
--- (Devuelve solo id y nombre, nunca la lista completa de pacientes)
+-- Tabla: selección de alimentos por paciente
+-- "selections": qué opciones tildó la profesional, por ítem.
+--   Ej: { "g1-leche": ["Descremada", "Sola"], "g1-queso": ["Blanco", "Solo"] }
+-- "notes": cantidad total por día / notas de preparación, por grupo.
+--   Ej: { "g1": "200ml por día, tibia o fría" }
 -- ---------------------------------------------------------
--- Se borra primero porque cambia el tipo de retorno (se agregó tracking_type)
-drop function if exists get_patient_by_code(text);
+create table if not exists patient_food_plan (
+  patient_id uuid primary key references patients(id) on delete cascade,
+  selections jsonb not null default '{}'::jsonb,
+  notes jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
 
-create or replace function get_patient_by_code(p_code text)
-returns table (id uuid, name text, tracking_type text)
+alter table patient_food_plan enable row level security;
+
+-- Solo la profesional (logueada en el panel) puede leer y editar
+drop policy if exists "authenticated_full_access_food_plan" on patient_food_plan;
+create policy "authenticated_full_access_food_plan" on patient_food_plan
+  for all
+  using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+-- Nota: el paciente NUNCA tiene acceso directo a esta tabla (ni lectura
+-- ni escritura). Solo puede leerla, de forma indirecta y de solo lectura,
+-- a través de la función get_patient_food_plan de abajo.
+
+-- ---------------------------------------------------------
+-- Función segura: traer la selección de alimentos de una paciente
+-- por su código de link (solo lectura, sin exponer la tabla completa)
+-- ---------------------------------------------------------
+create or replace function get_patient_food_plan(p_code text)
+returns table (selections jsonb, notes jsonb)
 language sql
 security definer
 set search_path = public
 as $$
-  select id, name, tracking_type from patients where code = p_code;
+  select coalesce(fp.selections, '{}'::jsonb), coalesce(fp.notes, '{}'::jsonb)
+  from patients p
+  left join patient_food_plan fp on fp.patient_id = p.id
+  where p.code = p_code;
+$$;
+
+grant execute on function get_patient_food_plan(text) to anon;
+
+-- ---------------------------------------------------------
+-- Función segura: buscar paciente por código de link
+-- (Devuelve solo id, nombre, tipo de seguimiento y fecha de creación;
+-- nunca la lista completa de pacientes)
+-- ---------------------------------------------------------
+-- Se borra primero porque cambia el tipo de retorno (se agregó tracking_type / created_at)
+drop function if exists get_patient_by_code(text);
+
+create or replace function get_patient_by_code(p_code text)
+returns table (id uuid, name text, tracking_type text, created_at timestamptz)
+language sql
+security definer
+set search_path = public
+as $$
+  select id, name, tracking_type, created_at from patients where code = p_code;
 $$;
 
 grant execute on function get_patient_by_code(text) to anon;
