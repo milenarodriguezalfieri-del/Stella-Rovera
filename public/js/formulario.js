@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient.js?v=2';
-import { STAGES } from './stages.js?v=2';
+import { STAGES, stageIconPath } from './stages.js?v=3';
 import { FOOD_GROUPS } from './foodGroups.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
@@ -265,7 +265,7 @@ function renderStageCards() {
       card.style.boxShadow = '0 0 0 2px var(--sage-deep)';
     }
     card.innerHTML = `
-      <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px;"><img src="assets/logo/food-group-icon.png" alt="" style="width:16px; height:auto; filter:brightness(0) invert(1);" /><span style="font-family:'Playfair Display',serif; text-transform:uppercase; letter-spacing:0.05em; font-size:19px; font-weight:400; color:var(--stage-text);">Etapa ${stage.stageRoman}</span></div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:12px;"><img src="${stageIconPath(stage.stage)}" alt="" style="width:16px; height:auto; filter:brightness(0) invert(1);" /><span style="font-family:'Playfair Display',serif; text-transform:uppercase; letter-spacing:0.05em; font-size:19px; font-weight:400; color:var(--stage-text);">Etapa ${stage.stageRoman}</span></div>
       <div style="display:flex; justify-content:center; align-items:center; height:28px; margin-bottom:12px;">${answeredCount === 7 ? `<span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:var(--rosa); color:var(--paper);"><svg width="14" height="14" viewBox="0 0 14 14"><polyline points="2,7 6,11 12,3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg></span>` : ''}</div>
       <div style="font-family:'Playfair Display',serif; font-weight:400; font-size:17px; line-height:1.5; color:var(--stage-text); flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">${unlocked ? `${stage.titleRegular.trim()}<br><em style="font-size:19px; font-style:italic; font-weight:400;">${stage.titleItalic}</em>` : stage.title}</div>
       <span class="stage-progress" style="color:var(--stage-text); font-weight:400; font-size:15px; margin-top:12px;">${unlocked ? `${answeredCount}/7 días` : 'Bloqueada'}</span>
@@ -441,7 +441,7 @@ function renderStage() {
   title.style.display = 'flex';
   title.style.alignItems = 'center';
   title.style.gap = '10px';
-  title.innerHTML = `<img src="assets/logo/food-group-icon.png" alt="" style="width:18px; height:auto;" /><span>Etapa ${stage.stageRoman}</span>`;
+  title.innerHTML = `<img src="${stageIconPath(stage.stage)}" alt="" style="width:18px; height:auto;" /><span>Etapa ${stage.stageRoman}</span>`;
   el.stageContent.appendChild(title);
 
   const form = document.createElement('form');

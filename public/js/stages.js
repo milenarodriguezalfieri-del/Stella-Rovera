@@ -66,3 +66,14 @@ export const STAGES = [
 export function findStage(stageNumber) {
   return STAGES.find((s) => s.stage === stageNumber) || null;
 }
+
+// Ícono distinto por etapa: I = tallo/brote, II = hoja, III = flecha circular (ciclo/renovación).
+const STAGE_ICONS = {
+  1: 'stage-icon-1-tallo.png',
+  2: 'stage-icon-2-hojas.png',
+  3: 'stage-icon-3-flecha.png',
+};
+
+export function stageIconPath(stageNumber) {
+  return `assets/logo/${STAGE_ICONS[stageNumber] || STAGE_ICONS[1]}`;
+}
