@@ -110,7 +110,7 @@ async function loadPatients() {
 
     const copyBtn = document.createElement('button');
     copyBtn.type = 'button';
-    copyBtn.className = 'btn secondary';
+    copyBtn.className = 'btn secondary btn-sm';
     copyBtn.textContent = 'Copiar link paciente';
     copyBtn.addEventListener('click', () => {
       const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
@@ -122,7 +122,7 @@ async function loadPatients() {
 
     const alimentosBtn = document.createElement('button');
     alimentosBtn.type = 'button';
-    alimentosBtn.className = 'btn secondary';
+    alimentosBtn.className = 'btn secondary btn-sm';
     alimentosBtn.textContent = 'Selección de alimentos';
     alimentosBtn.addEventListener('click', () => {
       window.location.href = `paciente.html?id=${patient.id}&section=alimentos`;
@@ -131,7 +131,7 @@ async function loadPatients() {
 
     const menuBtn = document.createElement('button');
     menuBtn.type = 'button';
-    menuBtn.className = 'btn secondary';
+    menuBtn.className = 'btn secondary btn-sm';
     menuBtn.textContent = 'Menú semanal';
     menuBtn.addEventListener('click', () => {
       window.location.href = `paciente.html?id=${patient.id}&section=menu`;
@@ -141,7 +141,7 @@ async function loadPatients() {
     if (patient.tracking_type === 'alimentos_habitos') {
       const habitosBtn = document.createElement('button');
       habitosBtn.type = 'button';
-      habitosBtn.className = 'btn secondary';
+      habitosBtn.className = 'btn secondary btn-sm';
       habitosBtn.textContent = 'Hábitos';
       habitosBtn.addEventListener('click', () => {
         window.location.href = `paciente.html?id=${patient.id}&section=habitos`;

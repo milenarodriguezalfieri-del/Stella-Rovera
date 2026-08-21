@@ -167,6 +167,7 @@ button, input, textarea, select {
 }
 .btn.ghost:hover { background: var(--verde-pale); color: var(--verde-deep); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.btn-sm { font-size: 13px; padding: 8px 14px; gap: 6px; }
 
 /* ---------- Cards ---------- */
 
