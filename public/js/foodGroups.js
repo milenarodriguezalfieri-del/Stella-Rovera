@@ -181,7 +181,7 @@ export const FOOD_GROUPS = [
       },
       {
         id: 'g4-pastas-prep',
-        name: 'Formas de preparación (pastas)',
+        name: 'Forma de preparación de las pastas',
         options: [
           'Con aceite', 'Con margarina común', 'Con margarina dietética', 'Con manteca común',
           'Con manteca dietética', 'Con salsas comunes', 'Con salsas dietéticas',
