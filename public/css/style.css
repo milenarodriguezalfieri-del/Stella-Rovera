@@ -268,7 +268,7 @@ textarea { resize: vertical; min-height: 80px; }
   box-shadow: 0 0 0 1px var(--verde);
 }
 .patient-name { font-weight: 500; }
-.patient-code { font-size: 12px; color: var(--ink-soft); }
+.patient-code { font-size: 15px; color: var(--ink-soft); }
 
 .pill {
   display: inline-block;
