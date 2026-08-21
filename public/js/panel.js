@@ -93,16 +93,13 @@ async function loadPatients() {
 
     const info = document.createElement('div');
     const hasAnswers = patientsWithAnswers.has(patient.id);
-    const trackingLabel = patient.tracking_type === 'alimentos'
-      ? 'Selección de alimentos'
-      : 'Selección de alimentos + hábitos';
     info.innerHTML = `
       <div class="patient-name">${capitalizeWords(patient.name)}</div>
-      <div class="row" style="gap:8px; margin-top:4px; flex-wrap:wrap;">
-        <span class="pill" style="background:var(--rosa); color:var(--marron);">${trackingLabel}</span>
-        ${hasAnswers ? `<span class="pill">Nueva respuesta</span>` : ''}
-      </div>
-      <div class="patient-code mono" style="margin-top:4px;">${patient.code}</div>
+      ${
+        hasAnswers
+          ? `<div class="pill" style="margin-top:4px;">Nueva respuesta</div>`
+          : `<div class="patient-code mono">${patient.code}</div>`
+      }
     `;
     row.appendChild(info);
 
