@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
 import { FOOD_GROUPS } from './foodGroups.js?v=1';
+import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const patientId = params.get('id');
@@ -28,6 +29,8 @@ let activeSection = 'habitos';
 let foodSelections = {};
 let foodNotes = {};
 let patientCreatedAtLabel = '';
+let menuEntries = {};
+let menuNotes = '';
 
 function capitalizeWords(str) {
   return (str || '')
@@ -279,13 +282,147 @@ function renderAlimentosSection() {
   el.sectionAlimentos.appendChild(el.bottomSaveStatus);
 }
 
+async function saveWeeklyMenu() {
+  const { error } = await supabase.from('patient_weekly_menu').upsert(
+    [{ patient_id: patientId, entries: menuEntries, notes: menuNotes, updated_at: new Date().toISOString() }],
+    { onConflict: 'patient_id' }
+  );
+  return !error;
+}
+
+let activeMenuDay = 'lun';
+
 function renderMenuSection() {
-  el.sectionMenu.innerHTML = `
-    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px;">Menú semanal</h3>
-    <div class="card empty-state">
-      <p class="muted">Esta sección está en construcción. Pronto vas a poder armar acá el menú semanal personalizado para esta paciente.</p>
-    </div>
+  el.sectionMenu.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.style.marginBottom = '16px';
+  header.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">Menú semanal</h3>
   `;
+  el.sectionMenu.appendChild(header);
+
+  const menuSaveStatus = document.createElement('div');
+  menuSaveStatus.className = 'muted';
+  menuSaveStatus.style.fontSize = '13px';
+  menuSaveStatus.style.marginBottom = '16px';
+  menuSaveStatus.style.minHeight = '18px';
+  el.sectionMenu.appendChild(menuSaveStatus);
+
+  const flagSavingMenu = () => { menuSaveStatus.textContent = 'Guardando…'; };
+  const flagSavedMenu = async () => {
+    const ok = await saveWeeklyMenu();
+    const msg = ok ? 'Cambios guardados ✓' : 'No se pudo guardar. Probá de nuevo.';
+    menuSaveStatus.textContent = msg;
+    if (el.menuBottomStatus) el.menuBottomStatus.textContent = msg;
+    if (ok) setTimeout(() => {
+      if (menuSaveStatus.textContent === 'Cambios guardados ✓') menuSaveStatus.textContent = '';
+      if (el.menuBottomStatus && el.menuBottomStatus.textContent === 'Cambios guardados ✓') el.menuBottomStatus.textContent = '';
+    }, 2000);
+  };
+
+  // Pestañas de día
+  const dayTabs = document.createElement('div');
+  dayTabs.className = 'row';
+  dayTabs.style.gap = '6px';
+  dayTabs.style.flexWrap = 'wrap';
+  dayTabs.style.marginBottom = '20px';
+
+  for (const day of MENU_DAYS) {
+    const dayBtn = document.createElement('button');
+    dayBtn.type = 'button';
+    dayBtn.className = 'btn btn-sm' + (activeMenuDay === day.key ? '' : ' secondary');
+    dayBtn.textContent = day.label;
+    dayBtn.addEventListener('click', () => {
+      activeMenuDay = day.key;
+      renderMenuSection();
+    });
+    dayTabs.appendChild(dayBtn);
+  }
+  el.sectionMenu.appendChild(dayTabs);
+
+  // Campos del día activo
+  const dayCard = document.createElement('div');
+  dayCard.className = 'card';
+  dayCard.style.marginBottom = '20px';
+
+  const dayLabel = MENU_DAYS.find((d) => d.key === activeMenuDay)?.label || '';
+  const dayTitle = document.createElement('div');
+  dayTitle.style.fontFamily = "'DM Sans', sans-serif";
+  dayTitle.style.fontWeight = '700';
+  dayTitle.style.fontSize = '17px';
+  dayTitle.style.marginBottom = '14px';
+  dayTitle.textContent = dayLabel;
+  dayCard.appendChild(dayTitle);
+
+  for (const meal of MENU_MEALS) {
+    const mealBlock = document.createElement('div');
+    mealBlock.style.marginBottom = '14px';
+
+    const mealLabel = document.createElement('label');
+    mealLabel.textContent = meal.label;
+    mealLabel.style.marginBottom = '4px';
+    mealBlock.appendChild(mealLabel);
+
+    const area = document.createElement('textarea');
+    area.rows = 2;
+    area.value = (menuEntries[activeMenuDay] && menuEntries[activeMenuDay][meal.key]) || '';
+    area.addEventListener('blur', () => {
+      if (!menuEntries[activeMenuDay]) menuEntries[activeMenuDay] = {};
+      menuEntries[activeMenuDay][meal.key] = area.value.trim();
+      flagSavingMenu();
+      flagSavedMenu();
+    });
+
+    mealBlock.appendChild(area);
+    dayCard.appendChild(mealBlock);
+  }
+
+  el.sectionMenu.appendChild(dayCard);
+
+  // Notas generales (no por día)
+  const notesCard = document.createElement('div');
+  notesCard.className = 'card';
+  notesCard.style.marginBottom = '20px';
+
+  const notesTitle = document.createElement('div');
+  notesTitle.style.fontFamily = "'DM Sans', sans-serif";
+  notesTitle.style.fontWeight = '700';
+  notesTitle.style.fontSize = '17px';
+  notesTitle.style.marginBottom = '10px';
+  notesTitle.textContent = 'Notas – Lista de compras';
+  notesCard.appendChild(notesTitle);
+
+  const notesArea = document.createElement('textarea');
+  notesArea.rows = 4;
+  notesArea.value = menuNotes || '';
+  notesArea.addEventListener('blur', () => {
+    menuNotes = notesArea.value.trim();
+    flagSavingMenu();
+    flagSavedMenu();
+  });
+  notesCard.appendChild(notesArea);
+  el.sectionMenu.appendChild(notesCard);
+
+  const saveMenuBtn = document.createElement('button');
+  saveMenuBtn.type = 'button';
+  saveMenuBtn.className = 'btn';
+  saveMenuBtn.textContent = 'Guardar';
+  saveMenuBtn.style.display = 'block';
+  saveMenuBtn.style.margin = '8px auto 4px';
+  saveMenuBtn.addEventListener('click', () => {
+    menuNotes = notesArea.value.trim();
+    flagSavingMenu();
+    flagSavedMenu();
+  });
+  el.sectionMenu.appendChild(saveMenuBtn);
+
+  el.menuBottomStatus = document.createElement('div');
+  el.menuBottomStatus.className = 'muted';
+  el.menuBottomStatus.style.fontSize = '13px';
+  el.menuBottomStatus.style.textAlign = 'center';
+  el.menuBottomStatus.style.minHeight = '18px';
+  el.sectionMenu.appendChild(el.menuBottomStatus);
 }
 
 function setActiveSection(section) {
@@ -460,6 +597,15 @@ async function init() {
 
   foodSelections = foodPlan?.selections || {};
   foodNotes = foodPlan?.notes || {};
+
+  const { data: weeklyMenu } = await supabase
+    .from('patient_weekly_menu')
+    .select('entries, notes')
+    .eq('patient_id', patientId)
+    .maybeSingle();
+
+  menuEntries = weeklyMenu?.entries || {};
+  menuNotes = weeklyMenu?.notes || '';
 
   const { data: entries, error: entriesError } = await supabase
     .from('diary_entries')

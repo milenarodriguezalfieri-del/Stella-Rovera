@@ -139,6 +139,50 @@ $$;
 grant execute on function get_patient_food_plan(text) to anon;
 
 -- ---------------------------------------------------------
+-- Tabla: menú semanal por paciente
+-- "entries": contenido de cada celda, por día y comida.
+--   Ej: { "lun": { "desayuno": "Yogur con avena", "almuerzo": "..." }, "mar": {...} }
+-- "notes": texto libre de "Notas – Lista de compras".
+-- ---------------------------------------------------------
+create table if not exists patient_weekly_menu (
+  patient_id uuid primary key references patients(id) on delete cascade,
+  entries jsonb not null default '{}'::jsonb,
+  notes text not null default '',
+  updated_at timestamptz not null default now()
+);
+
+alter table patient_weekly_menu enable row level security;
+
+-- Solo la profesional (logueada en el panel) puede leer y editar
+drop policy if exists "authenticated_full_access_weekly_menu" on patient_weekly_menu;
+create policy "authenticated_full_access_weekly_menu" on patient_weekly_menu
+  for all
+  using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
+
+-- Nota: el paciente NUNCA tiene acceso directo a esta tabla (ni lectura
+-- ni escritura). Solo puede leerla, de forma indirecta y de solo lectura,
+-- a través de la función get_patient_weekly_menu de abajo.
+
+-- ---------------------------------------------------------
+-- Función segura: traer el menú semanal de una paciente
+-- por su código de link (solo lectura, sin exponer la tabla completa)
+-- ---------------------------------------------------------
+create or replace function get_patient_weekly_menu(p_code text)
+returns table (entries jsonb, notes text)
+language sql
+security definer
+set search_path = public
+as $$
+  select coalesce(wm.entries, '{}'::jsonb), coalesce(wm.notes, '')
+  from patients p
+  left join patient_weekly_menu wm on wm.patient_id = p.id
+  where p.code = p_code;
+$$;
+
+grant execute on function get_patient_weekly_menu(text) to anon;
+
+-- ---------------------------------------------------------
 -- Función segura: buscar paciente por código de link
 -- (Devuelve solo id, nombre, tipo de seguimiento y fecha de creación;
 -- nunca la lista completa de pacientes)

@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
 import { FOOD_GROUPS } from './foodGroups.js?v=1';
+import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const code = params.get('code');
@@ -26,6 +27,8 @@ let activeStage = 1;
 let activeSection = null; // null = chooser, 'habitos', 'alimentos'
 let foodSelections = {};
 let foodNotes = {};
+let menuEntries = {};
+let menuNotes = '';
 
 function show(node) {
   [el.loading, el.notFound, el.diaryView].forEach((n) => (n.style.display = 'none'));
@@ -110,6 +113,8 @@ function renderSectionChooser() {
   el.sectionChooser.appendChild(grid);
 }
 
+let activeMenuDay = 'lun';
+
 function renderMenuSection() {
   el.sectionMenu.innerHTML = '';
 
@@ -121,13 +126,116 @@ function renderMenuSection() {
   backBtn.addEventListener('click', () => setActiveSection(null));
   el.sectionMenu.appendChild(backBtn);
 
-  const empty = document.createElement('div');
-  empty.className = 'card empty-state';
-  empty.innerHTML = `
-    <h3 style="margin-bottom: 10px;">Menú semanal</h3>
-    <p class="muted">Tu nutricionista todavía no cargó tu menú semanal. Pronto vas a ver acá el detalle.</p>
-  `;
-  el.sectionMenu.appendChild(empty);
+  const hasAnyEntry = MENU_DAYS.some((day) =>
+    MENU_MEALS.some((meal) => (menuEntries[day.key]?.[meal.key] || '').trim().length > 0)
+  );
+  const hasNotes = (menuNotes || '').trim().length > 0;
+
+  if (!hasAnyEntry && !hasNotes) {
+    const empty = document.createElement('div');
+    empty.className = 'card empty-state';
+    empty.innerHTML = `
+      <h3 style="margin-bottom: 10px;">Menú semanal</h3>
+      <p class="muted">Tu nutricionista todavía no cargó tu menú semanal. Pronto vas a ver acá el detalle.</p>
+    `;
+    el.sectionMenu.appendChild(empty);
+    return;
+  }
+
+  const header = document.createElement('div');
+  header.style.marginBottom = '16px';
+  header.innerHTML = `<h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em;">Menú semanal</h3>`;
+  el.sectionMenu.appendChild(header);
+
+  // Pestañas de día
+  const dayTabs = document.createElement('div');
+  dayTabs.className = 'row';
+  dayTabs.style.gap = '6px';
+  dayTabs.style.flexWrap = 'wrap';
+  dayTabs.style.marginBottom = '20px';
+
+  for (const day of MENU_DAYS) {
+    const dayBtn = document.createElement('button');
+    dayBtn.type = 'button';
+    dayBtn.className = 'btn btn-sm' + (activeMenuDay === day.key ? '' : ' secondary');
+    dayBtn.textContent = day.label;
+    dayBtn.addEventListener('click', () => {
+      activeMenuDay = day.key;
+      renderMenuSection();
+    });
+    dayTabs.appendChild(dayBtn);
+  }
+  el.sectionMenu.appendChild(dayTabs);
+
+  // Comidas del día activo
+  const dayCard = document.createElement('div');
+  dayCard.className = 'card';
+  dayCard.style.marginBottom = '20px';
+
+  const dayLabel = MENU_DAYS.find((d) => d.key === activeMenuDay)?.label || '';
+  const dayTitle = document.createElement('div');
+  dayTitle.style.fontFamily = "'DM Sans', sans-serif";
+  dayTitle.style.fontWeight = '700';
+  dayTitle.style.fontSize = '17px';
+  dayTitle.style.marginBottom = '14px';
+  dayTitle.textContent = dayLabel;
+  dayCard.appendChild(dayTitle);
+
+  const dayHasContent = MENU_MEALS.some((meal) => (menuEntries[activeMenuDay]?.[meal.key] || '').trim().length > 0);
+
+  if (!dayHasContent) {
+    const noneMsg = document.createElement('p');
+    noneMsg.className = 'muted';
+    noneMsg.textContent = 'Todavía no hay nada cargado para este día.';
+    dayCard.appendChild(noneMsg);
+  } else {
+    for (const meal of MENU_MEALS) {
+      const value = (menuEntries[activeMenuDay]?.[meal.key] || '').trim();
+      if (!value) continue;
+
+      const mealBlock = document.createElement('div');
+      mealBlock.style.marginBottom = '12px';
+
+      const mealLabel = document.createElement('div');
+      mealLabel.style.fontWeight = '500';
+      mealLabel.style.marginBottom = '4px';
+      mealLabel.textContent = meal.label;
+      mealBlock.appendChild(mealLabel);
+
+      const mealText = document.createElement('div');
+      mealText.style.fontSize = '14px';
+      mealText.style.color = 'var(--ink-soft)';
+      mealText.style.whiteSpace = 'pre-wrap';
+      mealText.textContent = value;
+      mealBlock.appendChild(mealText);
+
+      dayCard.appendChild(mealBlock);
+    }
+  }
+
+  el.sectionMenu.appendChild(dayCard);
+
+  if (hasNotes) {
+    const notesCard = document.createElement('div');
+    notesCard.className = 'card';
+
+    const notesTitle = document.createElement('div');
+    notesTitle.style.fontFamily = "'DM Sans', sans-serif";
+    notesTitle.style.fontWeight = '700';
+    notesTitle.style.fontSize = '16px';
+    notesTitle.style.marginBottom = '8px';
+    notesTitle.textContent = 'Notas – Lista de compras';
+    notesCard.appendChild(notesTitle);
+
+    const notesText = document.createElement('div');
+    notesText.style.fontSize = '14px';
+    notesText.style.color = 'var(--ink-soft)';
+    notesText.style.whiteSpace = 'pre-wrap';
+    notesText.textContent = menuNotes.trim();
+    notesCard.appendChild(notesText);
+
+    el.sectionMenu.appendChild(notesCard);
+  }
 }
 
 function renderAlimentosSection() {
@@ -628,6 +736,11 @@ async function init() {
   const foodPlan = foodPlanRows && foodPlanRows[0];
   foodSelections = foodPlan?.selections || {};
   foodNotes = foodPlan?.notes || {};
+
+  const { data: weeklyMenuRows } = await supabase.rpc('get_patient_weekly_menu', { p_code: code });
+  const weeklyMenu = weeklyMenuRows && weeklyMenuRows[0];
+  menuEntries = weeklyMenu?.entries || {};
+  menuNotes = weeklyMenu?.notes || '';
 
   activeStage = STAGES.find((s) => !stageIsComplete(s.stage) && stageIsUnlocked(s.stage))?.stage || 1;
 
