@@ -115,7 +115,8 @@ function renderAlimentosSection() {
     el.sectionAlimentos.appendChild(backBtn);
   }
 
-  const anySelected = FOOD_GROUPS.some((group) => group.items.some((item) => (foodSelections[item.id] || []).length > 0));
+  const anySelected = FOOD_GROUPS.some((group) => group.items.some((item) => (foodSelections[item.id] || []).length > 0))
+    || Object.values(foodNotes).some((note) => (note || '').trim().length > 0);
 
   if (!anySelected) {
     const empty = document.createElement('div');
@@ -133,7 +134,7 @@ function renderAlimentosSection() {
   header.innerHTML = `
     <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">Selección de alimentos</h3>
     <p class="muted" style="margin-bottom:16px;">Fecha de creación: ${patient.created_at ? formatDate(patient.created_at) : ''}</p>
-    <p style="font-style: italic; font-weight: 400; color: var(--sage-deep); font-size: 19px; margin-bottom: 6px;">Alimentos que componen el plan de alimentación</p>
+    <p style="font-style: italic; font-weight: 400; color: var(--sage-deep); font-size: 16px; margin-bottom: 6px;">Alimentos que componen el plan de alimentación</p>
     <p style="font-family:'DM Sans',sans-serif; font-style:normal; font-size:16px; font-weight:300; line-height:1.6; color:var(--ink-soft);">Cantidad total por día y formas de preparación:</p>
   `;
   el.sectionAlimentos.appendChild(header);
@@ -147,13 +148,28 @@ function renderAlimentosSection() {
     groupCard.className = 'card';
     groupCard.style.marginBottom = '20px';
 
+    const groupTitleWrap = document.createElement('div');
+    groupTitleWrap.style.display = 'flex';
+    groupTitleWrap.style.alignItems = 'center';
+    groupTitleWrap.style.gap = '10px';
+    groupTitleWrap.style.marginBottom = '12px';
+
+    const groupIcon = document.createElement('img');
+    groupIcon.src = 'assets/logo/food-group-icon.png';
+    groupIcon.alt = '';
+    groupIcon.style.width = '22px';
+    groupIcon.style.height = 'auto';
+    groupIcon.style.flexShrink = '0';
+    groupTitleWrap.appendChild(groupIcon);
+
     const groupTitle = document.createElement('div');
     groupTitle.style.fontFamily = "'DM Sans', sans-serif";
     groupTitle.style.fontWeight = '700';
     groupTitle.style.fontSize = '18px';
-    groupTitle.style.marginBottom = '12px';
     groupTitle.textContent = group.name;
-    groupCard.appendChild(groupTitle);
+    groupTitleWrap.appendChild(groupTitle);
+
+    groupCard.appendChild(groupTitleWrap);
 
     for (const item of groupItems) {
       const itemBlock = document.createElement('div');
@@ -185,6 +201,30 @@ function renderAlimentosSection() {
     }
 
     el.sectionAlimentos.appendChild(groupCard);
+  }
+
+  const generalNote = (foodNotes.general || '').trim();
+  if (generalNote) {
+    const generalCard = document.createElement('div');
+    generalCard.className = 'card';
+    generalCard.style.marginBottom = '20px';
+
+    const generalTitle = document.createElement('div');
+    generalTitle.style.fontFamily = "'DM Sans', sans-serif";
+    generalTitle.style.fontWeight = '700';
+    generalTitle.style.fontSize = '18px';
+    generalTitle.style.marginBottom = '10px';
+    generalTitle.textContent = 'Notas generales';
+    generalCard.appendChild(generalTitle);
+
+    const generalText = document.createElement('div');
+    generalText.style.fontSize = '14px';
+    generalText.style.color = 'var(--ink-soft)';
+    generalText.style.whiteSpace = 'pre-wrap';
+    generalText.textContent = generalNote;
+    generalCard.appendChild(generalText);
+
+    el.sectionAlimentos.appendChild(generalCard);
   }
 }
 

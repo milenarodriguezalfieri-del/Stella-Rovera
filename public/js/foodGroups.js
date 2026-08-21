@@ -45,7 +45,7 @@ export const FOOD_GROUPS = [
       },
       {
         id: 'g2-carnes-prep',
-        name: 'Formas de preparación (carnes)',
+        name: 'Formas de preparación de la carne',
         options: [
           'Asada a la parrilla', 'Al horno', 'A la plancha', 'Al spiedo',
           'Hervida', 'A la cacerola', 'Puchero', 'Cazuela dietética',
@@ -69,7 +69,7 @@ export const FOOD_GROUPS = [
       },
       {
         id: 'g2-huevos-prep',
-        name: 'Formas de preparación (huevos)',
+        name: 'Formas de preparación del huevo',
         options: [
           'Pasado por agua', 'Poché', 'Duro', 'Revuelto con vegetales',
           'En ensaladas', 'En budines', 'Soufflé', 'Tortilla horneada',
@@ -114,7 +114,7 @@ export const FOOD_GROUPS = [
       },
       {
         id: 'g3-veg-leg-prep',
-        name: 'Formas de preparación (vegetales y legumbres)',
+        name: 'Formas de preparación de vegetales y legumbres',
         options: [
           'Crudos', 'Al vapor', 'Hervidos', 'Asados al horno', 'En puré', 'Solos',
           'En ensaladas', 'En rellenos', 'Con salsas dietéticas', 'En tortillas y croquetas al horno',
@@ -123,27 +123,27 @@ export const FOOD_GROUPS = [
       },
       {
         id: 'g3-frutas-1',
-        name: 'Frutas grupo "1"',
+        name: 'Frutas "1"',
         options: ['Frutilla', 'Grosella', 'Guinda', 'Lima', 'Limón', 'Melón', 'Sandía'],
       },
       {
         id: 'g3-frutas-2',
-        name: 'Frutas grupo "2"',
+        name: 'Frutas "2"',
         options: ['Ciruela', 'Frambuesa', 'Mandarina', 'Melón rocío de miel', 'Mora', 'Naranja', 'Níspero', 'Papaya', 'Pomelo', 'Quinoto', 'Kiwi'],
       },
       {
         id: 'g3-frutas-3',
-        name: 'Frutas grupo "3"',
+        name: 'Frutas "3"',
         options: ['Ananá', 'Cereza', 'Damasco', 'Durazno', 'Granada', 'Guayaba', 'Higo', 'Mango', 'Manzana verde', 'Manzana deliciosa', 'Membrillo', 'Pera', 'Zarzamora'],
       },
       {
         id: 'g3-frutas-4',
-        name: 'Frutas grupo "4"',
+        name: 'Frutas "4"',
         options: ['Banana', 'Chirimoya', 'Kaki', 'Mamón', 'Mango', 'Uva'],
       },
       {
         id: 'g3-frutas-secas',
-        name: 'Frutas secas',
+        name: 'Frutos secos',
         options: ['Avellanas', 'Almendras', 'Castañas de cajú', 'Maní', 'Nueces'],
       },
       {
