@@ -77,3 +77,11 @@ const STAGE_ICONS = {
 export function stageIconPath(stageNumber) {
   return `assets/logo/${STAGE_ICONS[stageNumber] || STAGE_ICONS[1]}`;
 }
+
+// El ícono de la Etapa I (tallo) es más achatado que los otros dos,
+// así que necesita más ancho para verse del mismo tamaño visual.
+const STAGE_ICON_WIDTHS = { 1: 1.4, 2: 1, 3: 1 };
+
+export function stageIconWidth(stageNumber, baseWidth) {
+  return Math.round(baseWidth * (STAGE_ICON_WIDTHS[stageNumber] || 1));
+}
