@@ -97,6 +97,9 @@ create policy "anon_update_entries" on diary_entries
 -- Función segura: buscar paciente por código de link
 -- (Devuelve solo id y nombre, nunca la lista completa de pacientes)
 -- ---------------------------------------------------------
+-- Se borra primero porque cambia el tipo de retorno (se agregó tracking_type)
+drop function if exists get_patient_by_code(text);
+
 create or replace function get_patient_by_code(p_code text)
 returns table (id uuid, name text, tracking_type text)
 language sql
