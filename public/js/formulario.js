@@ -16,6 +16,7 @@ const el = {
   sectionChooser: document.getElementById('section-chooser'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
+  sectionMenu: document.getElementById('section-menu'),
   backToChooserBtn: document.getElementById('back-to-chooser-btn'),
 };
 
@@ -79,7 +80,7 @@ function renderSectionChooser() {
 
   const grid = document.createElement('div');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = hasBothSections() ? 'repeat(2, 1fr)' : '1fr';
+  grid.style.gridTemplateColumns = hasBothSections() ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)';
   grid.style.gap = '14px';
   grid.style.marginBottom = '32px';
 
@@ -89,6 +90,13 @@ function renderSectionChooser() {
   });
   alimentosTile.addEventListener('click', () => setActiveSection('alimentos'));
   grid.appendChild(alimentosTile);
+
+  const menuTile = sectionTile({
+    title: 'Menú semanal',
+    description: 'Tu menú semanal personalizado, armado junto a Stella.',
+  });
+  menuTile.addEventListener('click', () => setActiveSection('menu'));
+  grid.appendChild(menuTile);
 
   if (hasBothSections()) {
     const habitosTile = sectionTile({
@@ -102,18 +110,36 @@ function renderSectionChooser() {
   el.sectionChooser.appendChild(grid);
 }
 
+function renderMenuSection() {
+  el.sectionMenu.innerHTML = '';
+
+  const backBtn = document.createElement('button');
+  backBtn.type = 'button';
+  backBtn.className = 'btn ghost no-print';
+  backBtn.style.marginBottom = '20px';
+  backBtn.textContent = '← Volver a las secciones';
+  backBtn.addEventListener('click', () => setActiveSection(null));
+  el.sectionMenu.appendChild(backBtn);
+
+  const empty = document.createElement('div');
+  empty.className = 'card empty-state';
+  empty.innerHTML = `
+    <h3 style="margin-bottom: 10px;">Menú semanal</h3>
+    <p class="muted">Tu nutricionista todavía no cargó tu menú semanal. Pronto vas a ver acá el detalle.</p>
+  `;
+  el.sectionMenu.appendChild(empty);
+}
+
 function renderAlimentosSection() {
   el.sectionAlimentos.innerHTML = '';
 
-  if (hasBothSections()) {
-    const backBtn = document.createElement('button');
-    backBtn.type = 'button';
-    backBtn.className = 'btn ghost no-print';
-    backBtn.style.marginBottom = '20px';
-    backBtn.textContent = '← Volver a las secciones';
-    backBtn.addEventListener('click', () => setActiveSection(null));
-    el.sectionAlimentos.appendChild(backBtn);
-  }
+  const backBtn = document.createElement('button');
+  backBtn.type = 'button';
+  backBtn.className = 'btn ghost no-print';
+  backBtn.style.marginBottom = '20px';
+  backBtn.textContent = '← Volver a las secciones';
+  backBtn.addEventListener('click', () => setActiveSection(null));
+  el.sectionAlimentos.appendChild(backBtn);
 
   const anySelected = FOOD_GROUPS.some((group) => group.items.some((item) => (foodSelections[item.id] || []).length > 0))
     || Object.values(foodNotes).some((note) => (note || '').trim().length > 0);
@@ -233,9 +259,10 @@ function setActiveSection(section) {
   el.sectionChooser.style.display = section === null ? 'block' : 'none';
   el.sectionHabitos.style.display = section === 'habitos' ? 'block' : 'none';
   el.sectionAlimentos.style.display = section === 'alimentos' ? 'block' : 'none';
+  el.sectionMenu.style.display = section === 'menu' ? 'block' : 'none';
 
   if (section === 'habitos') {
-    el.backToChooserBtn.style.display = hasBothSections() ? 'inline-flex' : 'none';
+    el.backToChooserBtn.style.display = 'inline-flex';
   }
 
   if (section !== null) {
@@ -612,6 +639,7 @@ async function init() {
 
   renderSectionChooser();
   renderAlimentosSection();
+  renderMenuSection();
   renderStageCards();
   renderStage();
   setActiveSection(null);

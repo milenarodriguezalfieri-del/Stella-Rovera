@@ -129,6 +129,15 @@ async function loadPatients() {
     });
     actions.appendChild(alimentosBtn);
 
+    const menuBtn = document.createElement('button');
+    menuBtn.type = 'button';
+    menuBtn.className = 'btn secondary';
+    menuBtn.textContent = 'Menú semanal';
+    menuBtn.addEventListener('click', () => {
+      window.location.href = `paciente.html?id=${patient.id}&section=menu`;
+    });
+    actions.appendChild(menuBtn);
+
     if (patient.tracking_type === 'alimentos_habitos') {
       const habitosBtn = document.createElement('button');
       habitosBtn.type = 'button';

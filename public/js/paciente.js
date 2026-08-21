@@ -18,6 +18,7 @@ const el = {
   sectionTabs: document.getElementById('section-tabs'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
+  sectionMenu: document.getElementById('section-menu'),
 };
 
 let entryMap = {};
@@ -71,6 +72,13 @@ function renderSectionTabs() {
   alimentosBtn.textContent = 'Selección de alimentos';
   alimentosBtn.addEventListener('click', () => setActiveSection('alimentos'));
   el.sectionTabs.appendChild(alimentosBtn);
+
+  const menuBtn = document.createElement('button');
+  menuBtn.type = 'button';
+  menuBtn.className = 'btn' + (activeSection === 'menu' ? '' : ' secondary');
+  menuBtn.textContent = 'Menú semanal';
+  menuBtn.addEventListener('click', () => setActiveSection('menu'));
+  el.sectionTabs.appendChild(menuBtn);
 }
 
 async function saveFoodPlan() {
@@ -271,10 +279,20 @@ function renderAlimentosSection() {
   el.sectionAlimentos.appendChild(el.bottomSaveStatus);
 }
 
+function renderMenuSection() {
+  el.sectionMenu.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:16px;">Menú semanal</h3>
+    <div class="card empty-state">
+      <p class="muted">Esta sección está en construcción. Pronto vas a poder armar acá el menú semanal personalizado para esta paciente.</p>
+    </div>
+  `;
+}
+
 function setActiveSection(section) {
   activeSection = section;
   el.sectionHabitos.style.display = section === 'habitos' ? 'block' : 'none';
   el.sectionAlimentos.style.display = section === 'alimentos' ? 'block' : 'none';
+  el.sectionMenu.style.display = section === 'menu' ? 'block' : 'none';
   renderSectionTabs();
 
   const url = new URL(window.location.href);
@@ -461,10 +479,18 @@ async function init() {
   renderStageCards();
   renderStageDetail();
   renderAlimentosSection();
+  renderMenuSection();
 
-  const initialSection = requestedSection === 'alimentos' || patientTrackingType !== 'alimentos_habitos'
-    ? 'alimentos'
-    : 'habitos';
+  let initialSection = 'alimentos';
+  if (requestedSection === 'habitos' && patientTrackingType === 'alimentos_habitos') {
+    initialSection = 'habitos';
+  } else if (requestedSection === 'menu') {
+    initialSection = 'menu';
+  } else if (requestedSection === 'alimentos') {
+    initialSection = 'alimentos';
+  } else if (patientTrackingType === 'alimentos_habitos') {
+    initialSection = 'habitos';
+  }
   setActiveSection(initialSection);
 
   el.loading.style.display = 'none';
