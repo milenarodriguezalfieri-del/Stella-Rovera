@@ -180,7 +180,7 @@ function renderMenuSection() {
 
     for (const meal of MENU_MEALS) {
       const td = document.createElement('td');
-      td.style.cssText = 'border:1px solid var(--border); padding:8px; vertical-align:top; font-size:13px; color:var(--ink-soft); white-space:pre-wrap;';
+      td.style.cssText = 'border:1px solid var(--border); padding:8px; vertical-align:top; font-size:13px; color:var(--ink-soft); white-space:pre-wrap; background:var(--rosa-pale);';
       td.textContent = (menuEntries[day.key]?.[meal.key] || '').trim();
       tr.appendChild(td);
     }

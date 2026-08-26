@@ -356,7 +356,7 @@ function renderMenuSection() {
 
     for (const meal of MENU_MEALS) {
       const td = document.createElement('td');
-      td.style.cssText = 'border:1px solid var(--border); padding:2px; vertical-align:top;';
+      td.style.cssText = 'border:1px solid var(--border); padding:2px; vertical-align:top; background:var(--rosa-pale);';
 
       const area = document.createElement('textarea');
       area.rows = 3;
