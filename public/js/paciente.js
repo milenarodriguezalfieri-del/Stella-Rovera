@@ -2,7 +2,6 @@ import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
 import { FOOD_GROUPS } from './foodGroups.js?v=2';
 import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
-import { buildPatientMessage } from './patientMessage.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const patientId = params.get('id');
@@ -19,7 +18,6 @@ const el = {
   stageDetail: document.getElementById('stage-detail'),
   sectionTabs: document.getElementById('section-tabs'),
   copyLinkBtn: document.getElementById('copy-link-btn'),
-  copyMsgBtn: document.getElementById('copy-msg-btn'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
   sectionMenu: document.getElementById('section-menu'),
@@ -588,16 +586,6 @@ async function init() {
     el.copyLinkBtn.textContent = 'Copiado ✓';
     setTimeout(() => (el.copyLinkBtn.textContent = 'Copiar link paciente'), 1500);
   });
-
-  if (el.copyMsgBtn) {
-    el.copyMsgBtn.addEventListener('click', () => {
-      const shareUrl = `${window.location.origin}${window.location.pathname.replace('paciente.html', 'formulario.html')}?code=${patient.code}`;
-      const message = buildPatientMessage(capitalizeWords(patient.name), patientTrackingType, shareUrl);
-      navigator.clipboard.writeText(message);
-      el.copyMsgBtn.textContent = 'Copiado ✓';
-      setTimeout(() => (el.copyMsgBtn.textContent = 'Copiar mensaje'), 1500);
-    });
-  }
 
   const { data: foodPlan } = await supabase
     .from('patient_food_plan')
