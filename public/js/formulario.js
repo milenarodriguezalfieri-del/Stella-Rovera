@@ -145,51 +145,40 @@ function renderMenuSection() {
   header.innerHTML = `<h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em;">Menú semanal</h3>`;
   el.sectionMenu.appendChild(header);
 
-  const tableWrap = document.createElement('div');
-  tableWrap.className = 'card';
-  tableWrap.style.overflowX = 'auto';
-  tableWrap.style.marginBottom = '24px';
+  const gridWrap = document.createElement('div');
+  gridWrap.style.overflowX = 'auto';
+  gridWrap.style.marginBottom = '24px';
 
-  const table = document.createElement('table');
-  table.style.width = '100%';
-  table.style.borderCollapse = 'collapse';
-  table.style.minWidth = '560px';
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = '70px repeat(4, minmax(140px, 1fr))';
+  grid.style.gap = '10px';
+  grid.style.minWidth = '620px';
 
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  const cornerTh = document.createElement('th');
-  cornerTh.style.cssText = 'border:1px solid var(--border); padding:8px; background:var(--surface-2);';
-  headRow.appendChild(cornerTh);
+  grid.appendChild(document.createElement('div'));
   for (const meal of MENU_MEALS) {
-    const th = document.createElement('th');
-    th.textContent = meal.label;
-    th.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
-    headRow.appendChild(th);
+    const mealHead = document.createElement('div');
+    mealHead.textContent = meal.label;
+    mealHead.style.cssText = "font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; text-align:center; padding:4px 0;";
+    grid.appendChild(mealHead);
   }
-  thead.appendChild(headRow);
-  table.appendChild(thead);
 
-  const tbody = document.createElement('tbody');
   for (const day of MENU_DAYS) {
-    const tr = document.createElement('tr');
-
-    const dayTh = document.createElement('th');
-    dayTh.textContent = day.label;
-    dayTh.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
-    tr.appendChild(dayTh);
+    const dayLabelEl = document.createElement('div');
+    dayLabelEl.textContent = day.label;
+    dayLabelEl.style.cssText = "font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; display:flex; align-items:center; white-space:nowrap;";
+    grid.appendChild(dayLabelEl);
 
     for (const meal of MENU_MEALS) {
-      const td = document.createElement('td');
-      td.style.cssText = 'border:2px solid var(--rosa); padding:8px; vertical-align:top; font-size:13px; color:var(--ink-soft); white-space:pre-wrap;';
-      td.textContent = (menuEntries[day.key]?.[meal.key] || '').trim();
-      tr.appendChild(td);
+      const cell = document.createElement('div');
+      cell.style.cssText = 'border:2px solid var(--rosa); border-radius:14px; padding:8px 10px; font-size:13px; color:var(--ink-soft); white-space:pre-wrap; min-height:56px;';
+      cell.textContent = (menuEntries[day.key]?.[meal.key] || '').trim();
+      grid.appendChild(cell);
     }
-
-    tbody.appendChild(tr);
   }
-  table.appendChild(tbody);
-  tableWrap.appendChild(table);
-  el.sectionMenu.appendChild(tableWrap);
+
+  gridWrap.appendChild(grid);
+  el.sectionMenu.appendChild(gridWrap);
 
   if (hasNotes) {
     const notesCard = document.createElement('div');

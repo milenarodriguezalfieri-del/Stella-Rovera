@@ -319,48 +319,37 @@ function renderMenuSection() {
     }, 2000);
   };
 
-  const tableWrap = document.createElement('div');
-  tableWrap.style.overflowX = 'auto';
-  tableWrap.style.marginBottom = '24px';
-  tableWrap.className = 'card';
+  const gridWrap = document.createElement('div');
+  gridWrap.style.overflowX = 'auto';
+  gridWrap.style.marginBottom = '24px';
 
-  const table = document.createElement('table');
-  table.style.width = '100%';
-  table.style.borderCollapse = 'collapse';
-  table.style.minWidth = '640px';
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = '70px repeat(4, minmax(150px, 1fr))';
+  grid.style.gap = '10px';
+  grid.style.minWidth = '680px';
 
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  const cornerTh = document.createElement('th');
-  cornerTh.style.cssText = 'border:1px solid var(--border); padding:8px; background:var(--surface-2);';
-  headRow.appendChild(cornerTh);
+  // Esquina vacía + encabezados de comida (sin borde, solo texto)
+  grid.appendChild(document.createElement('div'));
   for (const meal of MENU_MEALS) {
-    const th = document.createElement('th');
-    th.textContent = meal.label;
-    th.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
-    headRow.appendChild(th);
+    const mealHead = document.createElement('div');
+    mealHead.textContent = meal.label;
+    mealHead.style.cssText = "font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; text-align:center; padding:4px 0;";
+    grid.appendChild(mealHead);
   }
-  thead.appendChild(headRow);
-  table.appendChild(thead);
 
-  const tbody = document.createElement('tbody');
   const allMenuAreas = [];
 
   for (const day of MENU_DAYS) {
-    const tr = document.createElement('tr');
-
-    const dayTh = document.createElement('th');
-    dayTh.textContent = day.label;
-    dayTh.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
-    tr.appendChild(dayTh);
+    const dayLabelEl = document.createElement('div');
+    dayLabelEl.textContent = day.label;
+    dayLabelEl.style.cssText = "font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; display:flex; align-items:center; white-space:nowrap;";
+    grid.appendChild(dayLabelEl);
 
     for (const meal of MENU_MEALS) {
-      const td = document.createElement('td');
-      td.style.cssText = 'border:2px solid var(--rosa); padding:2px; vertical-align:top;';
-
       const area = document.createElement('textarea');
       area.rows = 3;
-      area.style.cssText = 'width:100%; min-width:130px; border:none; background:transparent; font-size:13px; resize:vertical; padding:6px;';
+      area.style.cssText = 'width:100%; min-width:130px; border:2px solid var(--rosa); border-radius:14px; background:transparent; font-size:13px; resize:vertical; padding:8px 10px;';
       area.value = (menuEntries[day.key] && menuEntries[day.key][meal.key]) || '';
       area.dataset.day = day.key;
       area.dataset.meal = meal.key;
@@ -371,17 +360,13 @@ function renderMenuSection() {
         flagSavedMenu();
       });
 
-      td.appendChild(area);
-      tr.appendChild(td);
+      grid.appendChild(area);
       allMenuAreas.push(area);
     }
-
-    tbody.appendChild(tr);
   }
 
-  table.appendChild(tbody);
-  tableWrap.appendChild(table);
-  el.sectionMenu.appendChild(tableWrap);
+  gridWrap.appendChild(grid);
+  el.sectionMenu.appendChild(gridWrap);
 
   const notesCard = document.createElement('div');
   notesCard.className = 'card';
