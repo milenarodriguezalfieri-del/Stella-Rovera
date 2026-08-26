@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js?v=2';
+import { buildPatientMessage } from './patientMessage.js?v=1';
 
 const el = {
   loginView: document.getElementById('login-view'),
@@ -117,6 +118,19 @@ async function loadPatients() {
       setTimeout(() => (copyBtn.textContent = 'Copiar link paciente'), 1500);
     });
     actions.appendChild(copyBtn);
+
+    const copyMsgBtn = document.createElement('button');
+    copyMsgBtn.type = 'button';
+    copyMsgBtn.className = 'btn secondary btn-sm';
+    copyMsgBtn.textContent = 'Copiar mensaje';
+    copyMsgBtn.addEventListener('click', () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
+      const message = buildPatientMessage(capitalizeWords(patient.name), patient.tracking_type, shareUrl);
+      navigator.clipboard.writeText(message);
+      copyMsgBtn.textContent = 'Copiado ✓';
+      setTimeout(() => (copyMsgBtn.textContent = 'Copiar mensaje'), 1500);
+    });
+    actions.appendChild(copyMsgBtn);
 
     const alimentosBtn = document.createElement('button');
     alimentosBtn.type = 'button';
