@@ -153,17 +153,17 @@ function renderMenuSection() {
   const table = document.createElement('table');
   table.style.width = '100%';
   table.style.borderCollapse = 'collapse';
-  table.style.minWidth = '680px';
+  table.style.minWidth = '560px';
 
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   const cornerTh = document.createElement('th');
-  cornerTh.style.cssText = 'border:2px solid var(--rosa); padding:10px; background:var(--surface-2);';
+  cornerTh.style.cssText = 'border:1px solid var(--border); padding:8px; background:var(--surface-2);';
   headRow.appendChild(cornerTh);
   for (const meal of MENU_MEALS) {
     const th = document.createElement('th');
     th.textContent = meal.label;
-    th.style.cssText = "border:2px solid var(--rosa); padding:10px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
+    th.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
     headRow.appendChild(th);
   }
   thead.appendChild(headRow);
@@ -175,12 +175,12 @@ function renderMenuSection() {
 
     const dayTh = document.createElement('th');
     dayTh.textContent = day.label;
-    dayTh.style.cssText = "border:2px solid var(--rosa); padding:10px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
+    dayTh.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
     tr.appendChild(dayTh);
 
     for (const meal of MENU_MEALS) {
       const td = document.createElement('td');
-      td.style.cssText = 'border:2px solid var(--rosa); padding:14px; vertical-align:top; font-size:14px; min-height:100px; color:var(--ink-soft); white-space:pre-wrap;';
+      td.style.cssText = 'border:2px solid var(--rosa); padding:8px; vertical-align:top; font-size:13px; color:var(--ink-soft); white-space:pre-wrap;';
       td.textContent = (menuEntries[day.key]?.[meal.key] || '').trim();
       tr.appendChild(td);
     }

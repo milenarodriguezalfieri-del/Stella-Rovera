@@ -327,17 +327,17 @@ function renderMenuSection() {
   const table = document.createElement('table');
   table.style.width = '100%';
   table.style.borderCollapse = 'collapse';
-  table.style.minWidth = '760px';
+  table.style.minWidth = '640px';
 
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
   const cornerTh = document.createElement('th');
-  cornerTh.style.cssText = 'border:2px solid var(--rosa); padding:10px; background:var(--surface-2);';
+  cornerTh.style.cssText = 'border:1px solid var(--border); padding:8px; background:var(--surface-2);';
   headRow.appendChild(cornerTh);
   for (const meal of MENU_MEALS) {
     const th = document.createElement('th');
     th.textContent = meal.label;
-    th.style.cssText = "border:2px solid var(--rosa); padding:10px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
+    th.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
     headRow.appendChild(th);
   }
   thead.appendChild(headRow);
@@ -351,7 +351,7 @@ function renderMenuSection() {
 
     const dayTh = document.createElement('th');
     dayTh.textContent = day.label;
-    dayTh.style.cssText = "border:2px solid var(--rosa); padding:10px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
+    dayTh.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
     tr.appendChild(dayTh);
 
     for (const meal of MENU_MEALS) {
@@ -359,8 +359,8 @@ function renderMenuSection() {
       td.style.cssText = 'border:2px solid var(--rosa); padding:2px; vertical-align:top;';
 
       const area = document.createElement('textarea');
-      area.rows = 5;
-      area.style.cssText = 'width:100%; min-width:170px; min-height:100px; border:none; background:transparent; font-size:14px; resize:vertical; padding:10px;';
+      area.rows = 3;
+      area.style.cssText = 'width:100%; min-width:130px; border:none; background:transparent; font-size:13px; resize:vertical; padding:6px;';
       area.value = (menuEntries[day.key] && menuEntries[day.key][meal.key]) || '';
       area.dataset.day = day.key;
       area.dataset.meal = meal.key;
