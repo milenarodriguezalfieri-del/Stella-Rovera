@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
-import { FOOD_GROUPS } from './foodGroups.js?v=1';
+import { FOOD_GROUPS } from './foodGroups.js?v=2';
 import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
