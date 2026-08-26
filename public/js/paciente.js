@@ -17,6 +17,7 @@ const el = {
   stageArea: document.getElementById('stage-area'),
   stageDetail: document.getElementById('stage-detail'),
   sectionTabs: document.getElementById('section-tabs'),
+  copyLinkBtn: document.getElementById('copy-link-btn'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
   sectionMenu: document.getElementById('section-menu'),
@@ -578,6 +579,13 @@ async function init() {
 
   el.patientLabel.textContent = `Paciente ${capitalizeWords(patient.name)}`;
   el.patientSince.textContent = `Paciente desde ${formatDate(patient.created_at)}`;
+
+  el.copyLinkBtn.addEventListener('click', () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname.replace('paciente.html', 'formulario.html')}?code=${patient.code}`;
+    navigator.clipboard.writeText(shareUrl);
+    el.copyLinkBtn.textContent = 'Copiado ✓';
+    setTimeout(() => (el.copyLinkBtn.textContent = 'Copiar link paciente'), 1500);
+  });
 
   const { data: foodPlan } = await supabase
     .from('patient_food_plan')
