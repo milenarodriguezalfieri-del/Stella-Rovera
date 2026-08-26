@@ -151,9 +151,8 @@ function renderMenuSection() {
 
   const grid = document.createElement('div');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = '70px repeat(4, minmax(140px, 1fr))';
-  grid.style.gap = '10px';
-  grid.style.minWidth = '620px';
+  grid.style.gridTemplateColumns = '48px repeat(4, minmax(0, 1fr))';
+  grid.style.gap = '6px';
 
   grid.appendChild(document.createElement('div'));
   for (const meal of MENU_MEALS) {
@@ -171,7 +170,7 @@ function renderMenuSection() {
 
     for (const meal of MENU_MEALS) {
       const cell = document.createElement('div');
-      cell.style.cssText = 'border:2px solid var(--rosa); border-radius:14px; padding:8px 10px; font-size:13px; color:var(--ink-soft); white-space:pre-wrap; min-height:56px;';
+      cell.style.cssText = 'border:2px solid var(--rosa); border-radius:14px; padding:8px 10px; font-size:13px; color:var(--ink-soft); white-space:pre-wrap; min-height:56px; box-sizing:border-box; word-break:break-word;';
       cell.textContent = (menuEntries[day.key]?.[meal.key] || '').trim();
       grid.appendChild(cell);
     }

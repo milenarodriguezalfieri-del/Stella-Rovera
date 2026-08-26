@@ -325,9 +325,8 @@ function renderMenuSection() {
 
   const grid = document.createElement('div');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = '70px repeat(4, minmax(150px, 1fr))';
-  grid.style.gap = '10px';
-  grid.style.minWidth = '680px';
+  grid.style.gridTemplateColumns = '48px repeat(4, minmax(0, 1fr))';
+  grid.style.gap = '6px';
 
   // Esquina vacía + encabezados de comida (sin borde, solo texto)
   grid.appendChild(document.createElement('div'));
@@ -349,7 +348,7 @@ function renderMenuSection() {
     for (const meal of MENU_MEALS) {
       const area = document.createElement('textarea');
       area.rows = 3;
-      area.style.cssText = 'width:100%; min-width:130px; border:2px solid var(--rosa); border-radius:14px; background:transparent; font-size:13px; resize:vertical; padding:8px 10px;';
+      area.style.cssText = 'width:100%; border:2px solid var(--rosa); border-radius:14px; background:transparent; font-size:13px; resize:vertical; padding:8px 10px; box-sizing:border-box;';
       area.value = (menuEntries[day.key] && menuEntries[day.key][meal.key]) || '';
       area.dataset.day = day.key;
       area.dataset.meal = meal.key;
