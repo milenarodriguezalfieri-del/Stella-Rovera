@@ -290,8 +290,6 @@ async function saveWeeklyMenu() {
   return !error;
 }
 
-let activeMenuDay = 'lun';
-
 function renderMenuSection() {
   el.sectionMenu.innerHTML = '';
 
@@ -321,66 +319,70 @@ function renderMenuSection() {
     }, 2000);
   };
 
-  // Pestañas de día
-  const dayTabs = document.createElement('div');
-  dayTabs.className = 'row';
-  dayTabs.style.gap = '6px';
-  dayTabs.style.flexWrap = 'wrap';
-  dayTabs.style.marginBottom = '20px';
+  const tableWrap = document.createElement('div');
+  tableWrap.style.overflowX = 'auto';
+  tableWrap.style.marginBottom = '24px';
+  tableWrap.className = 'card';
+
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  table.style.minWidth = '640px';
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  const cornerTh = document.createElement('th');
+  cornerTh.style.cssText = 'border:1px solid var(--border); padding:8px; background:var(--surface-2);';
+  headRow.appendChild(cornerTh);
+  for (const meal of MENU_MEALS) {
+    const th = document.createElement('th');
+    th.textContent = meal.label;
+    th.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em;";
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const allMenuAreas = [];
 
   for (const day of MENU_DAYS) {
-    const dayBtn = document.createElement('button');
-    dayBtn.type = 'button';
-    dayBtn.className = 'btn btn-sm' + (activeMenuDay === day.key ? '' : ' secondary');
-    dayBtn.textContent = day.label;
-    dayBtn.addEventListener('click', () => {
-      activeMenuDay = day.key;
-      renderMenuSection();
-    });
-    dayTabs.appendChild(dayBtn);
-  }
-  el.sectionMenu.appendChild(dayTabs);
+    const tr = document.createElement('tr');
 
-  // Campos del día activo
-  const dayCard = document.createElement('div');
-  dayCard.className = 'card';
-  dayCard.style.marginBottom = '20px';
+    const dayTh = document.createElement('th');
+    dayTh.textContent = day.label;
+    dayTh.style.cssText = "border:1px solid var(--border); padding:8px; background:var(--surface-2); font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:0.03em; white-space:nowrap;";
+    tr.appendChild(dayTh);
 
-  const dayLabel = MENU_DAYS.find((d) => d.key === activeMenuDay)?.label || '';
-  const dayTitle = document.createElement('div');
-  dayTitle.style.fontFamily = "'DM Sans', sans-serif";
-  dayTitle.style.fontWeight = '700';
-  dayTitle.style.fontSize = '17px';
-  dayTitle.style.marginBottom = '14px';
-  dayTitle.textContent = dayLabel;
-  dayCard.appendChild(dayTitle);
+    for (const meal of MENU_MEALS) {
+      const td = document.createElement('td');
+      td.style.cssText = 'border:1px solid var(--border); padding:2px; vertical-align:top;';
 
-  for (const meal of MENU_MEALS) {
-    const mealBlock = document.createElement('div');
-    mealBlock.style.marginBottom = '14px';
+      const area = document.createElement('textarea');
+      area.rows = 3;
+      area.style.cssText = 'width:100%; min-width:130px; border:none; background:transparent; font-size:13px; resize:vertical; padding:6px;';
+      area.value = (menuEntries[day.key] && menuEntries[day.key][meal.key]) || '';
+      area.dataset.day = day.key;
+      area.dataset.meal = meal.key;
+      area.addEventListener('blur', () => {
+        if (!menuEntries[day.key]) menuEntries[day.key] = {};
+        menuEntries[day.key][meal.key] = area.value.trim();
+        flagSavingMenu();
+        flagSavedMenu();
+      });
 
-    const mealLabel = document.createElement('label');
-    mealLabel.textContent = meal.label;
-    mealLabel.style.marginBottom = '4px';
-    mealBlock.appendChild(mealLabel);
+      td.appendChild(area);
+      tr.appendChild(td);
+      allMenuAreas.push(area);
+    }
 
-    const area = document.createElement('textarea');
-    area.rows = 2;
-    area.value = (menuEntries[activeMenuDay] && menuEntries[activeMenuDay][meal.key]) || '';
-    area.addEventListener('blur', () => {
-      if (!menuEntries[activeMenuDay]) menuEntries[activeMenuDay] = {};
-      menuEntries[activeMenuDay][meal.key] = area.value.trim();
-      flagSavingMenu();
-      flagSavedMenu();
-    });
-
-    mealBlock.appendChild(area);
-    dayCard.appendChild(mealBlock);
+    tbody.appendChild(tr);
   }
 
-  el.sectionMenu.appendChild(dayCard);
+  table.appendChild(tbody);
+  tableWrap.appendChild(table);
+  el.sectionMenu.appendChild(tableWrap);
 
-  // Notas generales (no por día)
   const notesCard = document.createElement('div');
   notesCard.className = 'card';
   notesCard.style.marginBottom = '20px';
@@ -411,6 +413,10 @@ function renderMenuSection() {
   saveMenuBtn.style.display = 'block';
   saveMenuBtn.style.margin = '8px auto 4px';
   saveMenuBtn.addEventListener('click', () => {
+    for (const area of allMenuAreas) {
+      if (!menuEntries[area.dataset.day]) menuEntries[area.dataset.day] = {};
+      menuEntries[area.dataset.day][area.dataset.meal] = area.value.trim();
+    }
     menuNotes = notesArea.value.trim();
     flagSavingMenu();
     flagSavedMenu();
