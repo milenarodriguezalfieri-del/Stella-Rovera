@@ -23,7 +23,7 @@ export const FOOD_GROUPS = [
         id: 'g1-queso',
         name: 'Queso',
         options: [
-          'Blanco', 'Ricota', 'Cottage', 'Mozzarella', 'San Regín', 'Port Salud',
+          'Blanco', 'Ricota', 'Mozzarella', 'San Regín', 'Port Salud',
           'Fresco o similares magros', 'De máquina', 'Edam o Tilsit', 'Regianito',
           'Solo', 'Fundido', 'Con pan', 'Con galletitas', 'En preparaciones',
         ],

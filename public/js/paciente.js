@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
-import { FOOD_GROUPS } from './foodGroups.js?v=2';
+import { FOOD_GROUPS } from './foodGroups.js?v=3';
 import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
@@ -173,16 +173,35 @@ function renderAlimentosSection() {
       const itemBlock = document.createElement('div');
       itemBlock.style.marginBottom = '16px';
 
+      const itemHeader = document.createElement('div');
+      itemHeader.style.display = 'flex';
+      itemHeader.style.alignItems = 'center';
+      itemHeader.style.gap = '10px';
+      itemHeader.style.marginBottom = '6px';
+
       const itemLabel = document.createElement('div');
       itemLabel.style.fontWeight = '500';
-      itemLabel.style.marginBottom = '6px';
       itemLabel.textContent = item.name;
-      itemBlock.appendChild(itemLabel);
+      itemHeader.appendChild(itemLabel);
+
+      const toggleAllBtn = document.createElement('button');
+      toggleAllBtn.type = 'button';
+      toggleAllBtn.className = 'btn ghost btn-sm';
+      itemHeader.appendChild(toggleAllBtn);
+
+      itemBlock.appendChild(itemHeader);
 
       const optionsWrap = document.createElement('div');
       optionsWrap.style.display = 'flex';
       optionsWrap.style.flexWrap = 'wrap';
       optionsWrap.style.gap = '8px 16px';
+
+      const checkboxes = [];
+
+      const updateToggleLabel = () => {
+        const allChecked = checkboxes.length > 0 && checkboxes.every((cb) => cb.checked);
+        toggleAllBtn.textContent = allChecked ? 'Deseleccionar todos' : 'Seleccionar todos';
+      };
 
       for (const option of item.options) {
         const optLabel = document.createElement('label');
@@ -200,14 +219,27 @@ function renderAlimentosSection() {
           const current = new Set(foodSelections[item.id] || []);
           if (checkbox.checked) current.add(option); else current.delete(option);
           foodSelections[item.id] = Array.from(current);
+          updateToggleLabel();
           flagSaving();
           flagSaved();
         });
 
+        checkboxes.push(checkbox);
         optLabel.appendChild(checkbox);
         optLabel.appendChild(document.createTextNode(option));
         optionsWrap.appendChild(optLabel);
       }
+
+      updateToggleLabel();
+      toggleAllBtn.addEventListener('click', () => {
+        const allChecked = checkboxes.every((cb) => cb.checked);
+        const shouldCheck = !allChecked;
+        for (const cb of checkboxes) cb.checked = shouldCheck;
+        foodSelections[item.id] = shouldCheck ? [...item.options] : [];
+        updateToggleLabel();
+        flagSaving();
+        flagSaved();
+      });
 
       itemBlock.appendChild(optionsWrap);
       groupCard.appendChild(itemBlock);
