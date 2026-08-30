@@ -187,6 +187,7 @@ export const FOOD_GROUPS = [
           'Con manteca dietética', 'Con salsas comunes', 'Con salsas dietéticas',
           'Con quesos descremados', 'Con queso rallado',
         ],
+        hasFreeText: true,
       },
       {
         id: 'g4-panes',

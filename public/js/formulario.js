@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
-import { FOOD_GROUPS } from './foodGroups.js?v=4';
+import { FOOD_GROUPS } from './foodGroups.js?v=5';
 import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
@@ -238,7 +238,9 @@ function renderAlimentosSection() {
   el.sectionAlimentos.appendChild(header);
 
   for (const group of FOOD_GROUPS) {
-    const groupItems = group.items.filter((item) => (foodSelections[item.id] || []).length > 0);
+    const groupItems = group.items.filter((item) =>
+      (foodSelections[item.id] || []).length > 0 || (item.hasFreeText && (foodNotes[item.id] || '').trim().length > 0)
+    );
     const groupNote = (foodNotes[group.id] || '').trim();
     if (groupItems.length === 0 && !groupNote) continue;
 
@@ -282,8 +284,19 @@ function renderAlimentosSection() {
       const list = document.createElement('div');
       list.style.fontSize = '14px';
       list.style.color = 'var(--ink-soft)';
-      list.textContent = foodSelections[item.id].join(', ');
+      list.textContent = (foodSelections[item.id] || []).join(', ');
       itemBlock.appendChild(list);
+
+      const itemNote = item.hasFreeText ? (foodNotes[item.id] || '').trim() : '';
+      if (itemNote) {
+        const itemNoteEl = document.createElement('div');
+        itemNoteEl.style.fontSize = '13px';
+        itemNoteEl.style.fontStyle = 'italic';
+        itemNoteEl.style.color = 'var(--ink-soft)';
+        itemNoteEl.style.marginTop = '4px';
+        itemNoteEl.textContent = itemNote;
+        itemBlock.appendChild(itemNoteEl);
+      }
 
       groupCard.appendChild(itemBlock);
     }

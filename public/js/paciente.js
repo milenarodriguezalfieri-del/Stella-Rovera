@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient.js?v=2';
 import { STAGES, stageIconPath, stageIconWidth } from './stages.js?v=4';
-import { FOOD_GROUPS } from './foodGroups.js?v=4';
+import { FOOD_GROUPS } from './foodGroups.js?v=5';
 import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
@@ -242,6 +242,21 @@ function renderAlimentosSection() {
       });
 
       itemBlock.appendChild(optionsWrap);
+
+      if (item.hasFreeText) {
+        const freeTextArea = document.createElement('textarea');
+        freeTextArea.rows = 2;
+        freeTextArea.placeholder = 'Otras aclaraciones…';
+        freeTextArea.style.marginTop = '8px';
+        freeTextArea.value = foodNotes[item.id] || '';
+        freeTextArea.addEventListener('blur', () => {
+          foodNotes[item.id] = freeTextArea.value.trim();
+          flagSaving();
+          flagSaved();
+        });
+        itemBlock.appendChild(freeTextArea);
+      }
+
       groupCard.appendChild(itemBlock);
     }
 
