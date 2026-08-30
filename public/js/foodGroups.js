@@ -169,7 +169,7 @@ export const FOOD_GROUPS = [
       {
         id: 'g4-cereales',
         name: 'Cereales',
-        options: ['Copos de cereal (tipo corn flakes)', 'Arroz pulido', 'Arroz integral', 'Cebada perlada', 'Trigo', 'Maíz', 'Sémola', 'Mijo', 'Avena'],
+        options: ['Copos de cereal (tipo corn flakes)', 'Arroz pulido', 'Arroz integral', 'Cebada perlada', 'Trigo (burgol)', 'Maíz (polenta)', 'Sémola', 'Mijo', 'Avena'],
       },
       {
         id: 'g4-pastas',
@@ -255,7 +255,7 @@ export const FOOD_GROUPS = [
       {
         id: 'g7-sal',
         name: 'Sal de mesa',
-        options: ['Sal de mesa'],
+        options: ['Sal de mesa', 'Sal marina'],
       },
       {
         id: 'g7-sustitutos-sal',
