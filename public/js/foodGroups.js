@@ -106,11 +106,13 @@ export const FOOD_GROUPS = [
         id: 'g3-vegetales-c',
         name: 'Vegetales "C"',
         options: ['Batata', 'Choclo', 'Ñame', 'Papa', 'Palta'],
+        hasFreeText: true,
       },
       {
         id: 'g3-legumbres',
         name: 'Legumbres',
         options: ['Arvejas', 'Haba', 'Garbanzo', 'Lenteja', 'Poroto de manteca', 'Poroto de soja'],
+        hasFreeText: true,
       },
       {
         id: 'g3-veg-leg-prep',
@@ -140,6 +142,7 @@ export const FOOD_GROUPS = [
         id: 'g3-frutas-4',
         name: 'Frutas "4"',
         options: ['Banana', 'Chirimoya', 'Kaki', 'Mamón', 'Mango', 'Uva'],
+        hasFreeText: true,
       },
       {
         id: 'g3-frutas-secas',
@@ -150,6 +153,7 @@ export const FOOD_GROUPS = [
         id: 'g3-frutas-disecadas',
         name: 'Frutas disecadas',
         options: ['Orejones de durazno', 'Orejones de damasco', 'Dátiles', 'Pasas de uva', 'Ciruelas', 'Manzanas', 'Peras'],
+        hasFreeText: true,
       },
       {
         id: 'g3-frutas-prep',
