@@ -5,6 +5,7 @@ import { MENU_DAYS, MENU_MEALS } from './weeklyMenu.js?v=1';
 
 const params = new URLSearchParams(window.location.search);
 const code = params.get('code');
+const group = params.get('group'); // 'plan' = Plan alimentario, 'habitos' = Hábitos
 
 const el = {
   loading: document.getElementById('loading'),
@@ -24,7 +25,7 @@ const el = {
 let patient = null;
 let entryMap = {}; // "stage-day" -> { answer, answered_at }
 let activeStage = 1;
-let activeSection = null; // null = chooser, 'habitos', 'alimentos'
+let activeSection = null; // null = Plan alimentario chooser, 'habitos', 'alimentos', 'menu'
 let foodSelections = {};
 let foodNotes = {};
 let menuEntries = {};
@@ -78,14 +79,31 @@ function sectionTile({ title, description }) {
   return tile;
 }
 
+function habitosCrossLink() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn ghost no-print';
+  btn.textContent = 'Ver hábitos →';
+  btn.addEventListener('click', () => setActiveSection('habitos'));
+  return btn;
+}
+
 function renderSectionChooser() {
   el.sectionChooser.innerHTML = '';
 
+  const header = document.createElement('div');
+  header.style.marginBottom = '20px';
+  header.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Plan alimentario</h3>
+    <p class="muted" style="margin-bottom:0;">Tu selección de alimentos y tu menú semanal, armados junto a Stella.</p>
+  `;
+  el.sectionChooser.appendChild(header);
+
   const grid = document.createElement('div');
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = hasBothSections() ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)';
+  grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
   grid.style.gap = '14px';
-  grid.style.marginBottom = '32px';
+  grid.style.marginBottom = '20px';
 
   const alimentosTile = sectionTile({
     title: 'Selección de alimentos',
@@ -101,16 +119,14 @@ function renderSectionChooser() {
   menuTile.addEventListener('click', () => setActiveSection('menu'));
   grid.appendChild(menuTile);
 
-  if (hasBothSections()) {
-    const habitosTile = sectionTile({
-      title: 'Hábitos',
-      description: 'Tu diario de 21 días para reconocer y transformar tu relación con la comida.',
-    });
-    habitosTile.addEventListener('click', () => setActiveSection('habitos'));
-    grid.appendChild(habitosTile);
-  }
-
   el.sectionChooser.appendChild(grid);
+
+  if (hasBothSections()) {
+    const navRow = document.createElement('div');
+    navRow.style.marginBottom = '12px';
+    navRow.appendChild(habitosCrossLink());
+    el.sectionChooser.appendChild(navRow);
+  }
 }
 
 function renderMenuSection() {
@@ -119,10 +135,17 @@ function renderMenuSection() {
   const backBtn = document.createElement('button');
   backBtn.type = 'button';
   backBtn.className = 'btn ghost no-print';
-  backBtn.style.marginBottom = '20px';
-  backBtn.textContent = '← Volver a las secciones';
+  backBtn.textContent = '← Volver al plan alimentario';
   backBtn.addEventListener('click', () => setActiveSection(null));
-  el.sectionMenu.appendChild(backBtn);
+
+  const navRow = document.createElement('div');
+  navRow.style.display = 'flex';
+  navRow.style.flexWrap = 'wrap';
+  navRow.style.gap = '10px';
+  navRow.style.marginBottom = '20px';
+  navRow.appendChild(backBtn);
+  if (hasBothSections()) navRow.appendChild(habitosCrossLink());
+  el.sectionMenu.appendChild(navRow);
 
   const hasAnyEntry = MENU_DAYS.some((day) =>
     MENU_MEALS.some((meal) => (menuEntries[day.key]?.[meal.key] || '').trim().length > 0)
@@ -208,10 +231,17 @@ function renderAlimentosSection() {
   const backBtn = document.createElement('button');
   backBtn.type = 'button';
   backBtn.className = 'btn ghost no-print';
-  backBtn.style.marginBottom = '20px';
-  backBtn.textContent = '← Volver a las secciones';
+  backBtn.textContent = '← Volver al plan alimentario';
   backBtn.addEventListener('click', () => setActiveSection(null));
-  el.sectionAlimentos.appendChild(backBtn);
+
+  const navRow = document.createElement('div');
+  navRow.style.display = 'flex';
+  navRow.style.flexWrap = 'wrap';
+  navRow.style.gap = '10px';
+  navRow.style.marginBottom = '20px';
+  navRow.appendChild(backBtn);
+  if (hasBothSections()) navRow.appendChild(habitosCrossLink());
+  el.sectionAlimentos.appendChild(navRow);
 
   const anySelected = FOOD_GROUPS.some((group) => group.items.some((item) => (foodSelections[item.id] || []).length > 0))
     || Object.values(foodNotes).some((note) => (note || '').trim().length > 0);
@@ -732,7 +762,9 @@ async function init() {
   renderMenuSection();
   renderStageCards();
   renderStage();
-  setActiveSection(null);
+
+  const initialSection = group === 'habitos' && hasBothSections() ? 'habitos' : null;
+  setActiveSection(initialSection);
 
   show(el.diaryView);
 }
