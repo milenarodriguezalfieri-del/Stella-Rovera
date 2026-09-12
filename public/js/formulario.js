@@ -73,7 +73,7 @@ function sectionTile({ title, description }) {
   tile.style.background = 'var(--stage-bg)';
   tile.style.border = 'none';
   tile.innerHTML = `
-    <div style="font-family:'Playfair Display',serif; font-weight:400; font-size:21px; color:var(--stage-text); margin-bottom:10px;">${title}</div>
+    <div style="font-family:'Playfair Display',serif; font-weight:400; font-size:21px; line-height:1.3; color:var(--stage-text); margin-bottom:10px; min-height:2.6em; display:flex; align-items:center; justify-content:center;">${title}</div>
     <div style="font-family:'DM Sans',sans-serif; font-weight:300; font-size:14px; line-height:1.5; color:var(--stage-text); opacity:0.9;">${description}</div>
   `;
   return tile;
