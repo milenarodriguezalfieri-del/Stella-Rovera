@@ -106,9 +106,12 @@ async function loadPatients() {
     const actions = document.createElement('div');
     actions.className = 'row patient-actions';
 
+    const linksGroup = document.createElement('div');
+    linksGroup.className = 'row patient-actions-links';
+
     const copyPlanBtn = document.createElement('button');
     copyPlanBtn.type = 'button';
-    copyPlanBtn.className = 'btn secondary btn-sm';
+    copyPlanBtn.className = 'btn ghost btn-sm';
     copyPlanBtn.textContent = 'Copiar link Plan alimentario';
     copyPlanBtn.addEventListener('click', () => {
       const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=plan`;
@@ -116,12 +119,12 @@ async function loadPatients() {
       copyPlanBtn.textContent = 'Copiado ✓';
       setTimeout(() => (copyPlanBtn.textContent = 'Copiar link Plan alimentario'), 1500);
     });
-    actions.appendChild(copyPlanBtn);
+    linksGroup.appendChild(copyPlanBtn);
 
     if (patient.tracking_type === 'alimentos_habitos') {
       const copyHabitosLinkBtn = document.createElement('button');
       copyHabitosLinkBtn.type = 'button';
-      copyHabitosLinkBtn.className = 'btn secondary btn-sm';
+      copyHabitosLinkBtn.className = 'btn ghost btn-sm';
       copyHabitosLinkBtn.textContent = 'Copiar link Hábitos';
       copyHabitosLinkBtn.addEventListener('click', () => {
         const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=habitos`;
@@ -129,26 +132,22 @@ async function loadPatients() {
         copyHabitosLinkBtn.textContent = 'Copiado ✓';
         setTimeout(() => (copyHabitosLinkBtn.textContent = 'Copiar link Hábitos'), 1500);
       });
-      actions.appendChild(copyHabitosLinkBtn);
+      linksGroup.appendChild(copyHabitosLinkBtn);
     }
 
-    const alimentosBtn = document.createElement('button');
-    alimentosBtn.type = 'button';
-    alimentosBtn.className = 'btn secondary btn-sm';
-    alimentosBtn.textContent = 'Selección de alimentos';
-    alimentosBtn.addEventListener('click', () => {
+    actions.appendChild(linksGroup);
+
+    const editGroup = document.createElement('div');
+    editGroup.className = 'row patient-actions-edit';
+
+    const planBtn = document.createElement('button');
+    planBtn.type = 'button';
+    planBtn.className = 'btn secondary btn-sm';
+    planBtn.textContent = 'Plan alimentario';
+    planBtn.addEventListener('click', () => {
       window.location.href = `paciente.html?id=${patient.id}&section=alimentos`;
     });
-    actions.appendChild(alimentosBtn);
-
-    const menuBtn = document.createElement('button');
-    menuBtn.type = 'button';
-    menuBtn.className = 'btn secondary btn-sm';
-    menuBtn.textContent = 'Menú semanal';
-    menuBtn.addEventListener('click', () => {
-      window.location.href = `paciente.html?id=${patient.id}&section=menu`;
-    });
-    actions.appendChild(menuBtn);
+    editGroup.appendChild(planBtn);
 
     if (patient.tracking_type === 'alimentos_habitos') {
       const habitosBtn = document.createElement('button');
@@ -158,8 +157,10 @@ async function loadPatients() {
       habitosBtn.addEventListener('click', () => {
         window.location.href = `paciente.html?id=${patient.id}&section=habitos`;
       });
-      actions.appendChild(habitosBtn);
+      editGroup.appendChild(habitosBtn);
     }
+
+    actions.appendChild(editGroup);
 
     const secondaryActions = document.createElement('div');
     secondaryActions.className = 'row';
