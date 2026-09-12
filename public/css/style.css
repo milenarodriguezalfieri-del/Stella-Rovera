@@ -169,6 +169,17 @@ button, input, textarea, select {
 .btn.ghost:hover { background: var(--verde-pale); color: var(--verde-deep); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn.btn-sm { font-size: 15px; padding: 7px 12px; gap: 5px; white-space: nowrap; }
+.btn.olive-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--verde);
+  padding: 5px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  gap: 4px;
+  white-space: nowrap;
+}
+.btn.olive-link:hover { background: var(--verde-pale); color: var(--verde-deep); }
 
 /* ---------- Cards ---------- */
 
@@ -373,9 +384,10 @@ textarea { resize: vertical; min-height: 80px; }
 }
 
 .patient-actions {
-  gap: 10px;
-  flex-wrap: wrap;
-  row-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 .patient-actions-links {
   gap: 6px;
@@ -384,8 +396,8 @@ textarea { resize: vertical; min-height: 80px; }
 .patient-actions-edit {
   gap: 6px;
   flex-wrap: wrap;
-  padding-left: 10px;
-  border-left: 1px solid var(--line);
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
 }
 
 @media (max-width: 640px) {
@@ -407,10 +419,6 @@ textarea { resize: vertical; min-height: 80px; }
   #stage-content {
     order: 2;
     margin-top: 0;
-  }
-  .patient-actions-edit {
-    padding-left: 0;
-    border-left: none;
   }
 }
 
