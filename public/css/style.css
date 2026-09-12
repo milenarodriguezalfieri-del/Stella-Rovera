@@ -173,8 +173,8 @@ button, input, textarea, select {
   background: transparent;
   border-color: transparent;
   color: var(--verde);
-  padding: 5px 10px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: 15px;
   font-weight: 500;
   gap: 4px;
   white-space: nowrap;
