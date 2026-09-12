@@ -17,7 +17,8 @@ const el = {
   stageArea: document.getElementById('stage-area'),
   stageDetail: document.getElementById('stage-detail'),
   sectionTabs: document.getElementById('section-tabs'),
-  copyLinkBtn: document.getElementById('copy-link-btn'),
+  copyLinkPlanBtn: document.getElementById('copy-link-plan-btn'),
+  copyLinkHabitosBtn: document.getElementById('copy-link-habitos-btn'),
   sectionPlanChooser: document.getElementById('section-plan-chooser'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
@@ -112,9 +113,11 @@ function renderPlanChooser() {
 function renderSectionTabs() {
   el.sectionTabs.innerHTML = '';
 
+  const planActive = activeSection === 'plan' || activeSection === 'alimentos' || activeSection === 'menu';
+
   const planBtn = document.createElement('button');
   planBtn.type = 'button';
-  planBtn.className = 'btn' + (activeSection === 'plan' ? '' : ' secondary');
+  planBtn.className = 'btn' + (planActive ? '' : ' secondary');
   planBtn.textContent = 'Plan alimentario';
   planBtn.addEventListener('click', () => setActiveSection('plan'));
   el.sectionTabs.appendChild(planBtn);
@@ -126,20 +129,6 @@ function renderSectionTabs() {
   habitosBtn.disabled = patientTrackingType !== 'alimentos_habitos';
   habitosBtn.addEventListener('click', () => setActiveSection('habitos'));
   el.sectionTabs.appendChild(habitosBtn);
-
-  const alimentosBtn = document.createElement('button');
-  alimentosBtn.type = 'button';
-  alimentosBtn.className = 'btn' + (activeSection === 'alimentos' ? '' : ' secondary');
-  alimentosBtn.textContent = 'Selección de alimentos';
-  alimentosBtn.addEventListener('click', () => setActiveSection('alimentos'));
-  el.sectionTabs.appendChild(alimentosBtn);
-
-  const menuBtn = document.createElement('button');
-  menuBtn.type = 'button';
-  menuBtn.className = 'btn' + (activeSection === 'menu' ? '' : ' secondary');
-  menuBtn.textContent = 'Menú semanal';
-  menuBtn.addEventListener('click', () => setActiveSection('menu'));
-  el.sectionTabs.appendChild(menuBtn);
 }
 
 async function saveFoodPlan() {
@@ -685,12 +674,23 @@ async function init() {
   el.patientLabel.textContent = `Paciente ${capitalizeWords(patient.name)}`;
   el.patientSince.textContent = `Paciente desde ${formatDate(patient.created_at)}`;
 
-  el.copyLinkBtn.addEventListener('click', () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname.replace('paciente.html', 'formulario.html')}?code=${patient.code}`;
+  el.copyLinkPlanBtn.addEventListener('click', () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname.replace('paciente.html', 'formulario.html')}?code=${patient.code}&group=plan`;
     navigator.clipboard.writeText(shareUrl);
-    el.copyLinkBtn.textContent = 'Copiado ✓';
-    setTimeout(() => (el.copyLinkBtn.textContent = 'Copiar link paciente'), 1500);
+    el.copyLinkPlanBtn.textContent = 'Copiado ✓';
+    setTimeout(() => (el.copyLinkPlanBtn.textContent = 'Copiar link Plan alimentario'), 1500);
   });
+
+  if (patientTrackingType === 'alimentos_habitos') {
+    el.copyLinkHabitosBtn.addEventListener('click', () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname.replace('paciente.html', 'formulario.html')}?code=${patient.code}&group=habitos`;
+      navigator.clipboard.writeText(shareUrl);
+      el.copyLinkHabitosBtn.textContent = 'Copiado ✓';
+      setTimeout(() => (el.copyLinkHabitosBtn.textContent = 'Copiar link Hábitos'), 1500);
+    });
+  } else {
+    el.copyLinkHabitosBtn.style.display = 'none';
+  }
 
   const { data: foodPlan } = await supabase
     .from('patient_food_plan')
