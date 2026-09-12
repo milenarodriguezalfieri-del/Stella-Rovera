@@ -165,7 +165,6 @@ async function loadPatients() {
     const secondaryActions = document.createElement('div');
     secondaryActions.className = 'row';
     secondaryActions.style.gap = '6px';
-    secondaryActions.style.marginTop = '10px';
 
     const printBtn = document.createElement('button');
     printBtn.type = 'button';
