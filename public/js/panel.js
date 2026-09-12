@@ -25,7 +25,7 @@ function slugify(name) {
   return name
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z\s]/g, '')
     .trim()
     .split(/\s+/)
@@ -106,17 +106,31 @@ async function loadPatients() {
     const actions = document.createElement('div');
     actions.className = 'row patient-actions';
 
-    const copyBtn = document.createElement('button');
-    copyBtn.type = 'button';
-    copyBtn.className = 'btn secondary btn-sm';
-    copyBtn.textContent = 'Copiar link paciente';
-    copyBtn.addEventListener('click', () => {
-      const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
+    const copyPlanBtn = document.createElement('button');
+    copyPlanBtn.type = 'button';
+    copyPlanBtn.className = 'btn secondary btn-sm';
+    copyPlanBtn.textContent = 'Copiar link Plan alimentario';
+    copyPlanBtn.addEventListener('click', () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=plan`;
       navigator.clipboard.writeText(shareUrl);
-      copyBtn.textContent = 'Copiado ✓';
-      setTimeout(() => (copyBtn.textContent = 'Copiar link paciente'), 1500);
+      copyPlanBtn.textContent = 'Copiado ✓';
+      setTimeout(() => (copyPlanBtn.textContent = 'Copiar link Plan alimentario'), 1500);
     });
-    actions.appendChild(copyBtn);
+    actions.appendChild(copyPlanBtn);
+
+    if (patient.tracking_type === 'alimentos_habitos') {
+      const copyHabitosLinkBtn = document.createElement('button');
+      copyHabitosLinkBtn.type = 'button';
+      copyHabitosLinkBtn.className = 'btn secondary btn-sm';
+      copyHabitosLinkBtn.textContent = 'Copiar link Hábitos';
+      copyHabitosLinkBtn.addEventListener('click', () => {
+        const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=habitos`;
+        navigator.clipboard.writeText(shareUrl);
+        copyHabitosLinkBtn.textContent = 'Copiado ✓';
+        setTimeout(() => (copyHabitosLinkBtn.textContent = 'Copiar link Hábitos'), 1500);
+      });
+      actions.appendChild(copyHabitosLinkBtn);
+    }
 
     const alimentosBtn = document.createElement('button');
     alimentosBtn.type = 'button';
