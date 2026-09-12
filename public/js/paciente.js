@@ -18,6 +18,7 @@ const el = {
   stageDetail: document.getElementById('stage-detail'),
   sectionTabs: document.getElementById('section-tabs'),
   copyLinkBtn: document.getElementById('copy-link-btn'),
+  sectionPlanChooser: document.getElementById('section-plan-chooser'),
   sectionHabitos: document.getElementById('section-habitos'),
   sectionAlimentos: document.getElementById('section-alimentos'),
   sectionMenu: document.getElementById('section-menu'),
@@ -59,8 +60,64 @@ function answeredCountFor(stageNumber) {
   return stage.days.filter((d) => entryMap[`${stageNumber}-${d.day}`]?.answer).length;
 }
 
+function sectionTile({ title, description }) {
+  const tile = document.createElement('div');
+  tile.className = 'card stage-card';
+  tile.style.cursor = 'pointer';
+  tile.style.textAlign = 'center';
+  tile.style.padding = '32px 20px';
+  tile.style.background = 'var(--stage-bg)';
+  tile.style.border = 'none';
+  tile.innerHTML = `
+    <div style="font-family:'Playfair Display',serif; font-weight:400; font-size:21px; color:var(--stage-text); margin-bottom:10px;">${title}</div>
+    <div style="font-family:'DM Sans',sans-serif; font-weight:300; font-size:14px; line-height:1.5; color:var(--stage-text); opacity:0.9;">${description}</div>
+  `;
+  return tile;
+}
+
+function renderPlanChooser() {
+  el.sectionPlanChooser.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.style.marginBottom = '20px';
+  header.innerHTML = `
+    <h3 style="font-family:'Playfair Display', serif; font-weight:400; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Plan alimentario</h3>
+    <p class="muted" style="margin-bottom:0;">Elegí qué sección querés editar.</p>
+  `;
+  el.sectionPlanChooser.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  grid.style.gap = '14px';
+  grid.style.marginBottom = '20px';
+
+  const alimentosTile = sectionTile({
+    title: 'Selección de alimentos',
+    description: 'Cargar o editar los alimentos del plan.',
+  });
+  alimentosTile.addEventListener('click', () => setActiveSection('alimentos'));
+  grid.appendChild(alimentosTile);
+
+  const menuTile = sectionTile({
+    title: 'Menú semanal',
+    description: 'Cargar o editar el menú semanal.',
+  });
+  menuTile.addEventListener('click', () => setActiveSection('menu'));
+  grid.appendChild(menuTile);
+
+  el.sectionPlanChooser.appendChild(grid);
+}
+
 function renderSectionTabs() {
   el.sectionTabs.innerHTML = '';
+
+  const planBtn = document.createElement('button');
+  planBtn.type = 'button';
+  planBtn.className = 'btn' + (activeSection === 'plan' ? '' : ' secondary');
+  planBtn.textContent = 'Plan alimentario';
+  planBtn.addEventListener('click', () => setActiveSection('plan'));
+  el.sectionTabs.appendChild(planBtn);
 
   const habitosBtn = document.createElement('button');
   habitosBtn.type = 'button';
@@ -465,6 +522,7 @@ function renderMenuSection() {
 
 function setActiveSection(section) {
   activeSection = section;
+  el.sectionPlanChooser.style.display = section === 'plan' ? 'block' : 'none';
   el.sectionHabitos.style.display = section === 'habitos' ? 'block' : 'none';
   el.sectionAlimentos.style.display = section === 'alimentos' ? 'block' : 'none';
   el.sectionMenu.style.display = section === 'menu' ? 'block' : 'none';
@@ -669,18 +727,19 @@ async function init() {
 
   renderStageCards();
   renderStageDetail();
+  renderPlanChooser();
   renderAlimentosSection();
   renderMenuSection();
 
-  let initialSection = 'alimentos';
+  let initialSection = 'plan';
   if (requestedSection === 'habitos' && patientTrackingType === 'alimentos_habitos') {
     initialSection = 'habitos';
   } else if (requestedSection === 'menu') {
     initialSection = 'menu';
   } else if (requestedSection === 'alimentos') {
     initialSection = 'alimentos';
-  } else if (patientTrackingType === 'alimentos_habitos') {
-    initialSection = 'habitos';
+  } else if (requestedSection === 'plan') {
+    initialSection = 'plan';
   }
   setActiveSection(initialSection);
 
