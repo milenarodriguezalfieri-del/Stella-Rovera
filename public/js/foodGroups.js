@@ -12,7 +12,7 @@ export const FOOD_GROUPS = [
       {
         id: 'g1-leche',
         name: 'Leche',
-        options: ['Descremada', 'Parcialmente descremada', 'Entera'],
+        options: ['Descremada', 'Parcialmente descremada', 'Entera', 'Deslactosada'],
       },
       {
         id: 'g1-yogur',
