@@ -11,6 +11,7 @@ const el = {
   newPatientCard: document.getElementById('new-patient-card'),
   newPatientForm: document.getElementById('new-patient-form'),
   patientList: document.getElementById('patient-list'),
+  patientSearch: document.getElementById('patient-search'),
 };
 
 function capitalizeWords(str) {
@@ -54,6 +55,34 @@ async function refreshView() {
   }
 }
 
+function normalizeText(str) {
+  return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function applyPatientFilter() {
+  const q = normalizeText(el.patientSearch.value).trim();
+  const rows = el.patientList.querySelectorAll('.patient-row');
+  let visible = 0;
+  rows.forEach((row) => {
+    const match = !q || normalizeText(row.dataset.name).includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  let msg = el.patientList.querySelector('.no-results');
+  if (rows.length && visible === 0) {
+    if (!msg) {
+      msg = document.createElement('p');
+      msg.className = 'muted no-results';
+      msg.textContent = 'No hay pacientes con ese nombre.';
+      el.patientList.appendChild(msg);
+    }
+  } else if (msg) {
+    msg.remove();
+  }
+}
+
+el.patientSearch.addEventListener('input', applyPatientFilter);
+
 async function loadPatients() {
   el.patientList.innerHTML = '<p class="muted">Cargando…</p>';
   const { data, error } = await supabase
@@ -90,6 +119,7 @@ async function loadPatients() {
   for (const patient of data) {
     const row = document.createElement('div');
     row.className = 'patient-row';
+    row.dataset.name = patient.name;
 
     const info = document.createElement('div');
     const hasAnswers = patientsWithAnswers.has(patient.id);
@@ -228,6 +258,7 @@ async function loadPatients() {
     row.appendChild(secondaryActions);
     el.patientList.appendChild(row);
   }
+  applyPatientFilter();
 }
 
 el.loginForm.addEventListener('submit', async (e) => {
