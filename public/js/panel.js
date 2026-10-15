@@ -158,17 +158,6 @@ async function loadPatients() {
       '• Podés volver cuando quieras con el mismo link, así que guardalo.',
     ].join('\n');
 
-    const copyLinkBtn = document.createElement('button');
-    copyLinkBtn.type = 'button';
-    copyLinkBtn.className = 'btn olive-link';
-    copyLinkBtn.textContent = 'Copiar link';
-    copyLinkBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(patientUrl);
-      copyLinkBtn.textContent = 'Copiado ✓';
-      setTimeout(() => (copyLinkBtn.textContent = 'Copiar link'), 1500);
-    });
-    linksGroup.appendChild(copyLinkBtn);
-
     const whatsappBtn = document.createElement('button');
     whatsappBtn.type = 'button';
     whatsappBtn.className = 'btn olive-link';
