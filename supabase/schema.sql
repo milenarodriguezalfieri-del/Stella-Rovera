@@ -218,3 +218,28 @@ as $$
 $$;
 
 grant execute on function get_patient_entries(text) to anon;
+
+-- ---------------------------------------------------------
+-- Función segura: guardar una respuesta del diario desde el link
+-- de la paciente (sin login). Reemplaza el upsert directo, que
+-- falla cuando la persona no está logueada.
+-- ---------------------------------------------------------
+create or replace function save_diary_entry(
+  p_code text,
+  p_stage smallint,
+  p_day smallint,
+  p_answer text,
+  p_answered_at timestamptz
+)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  insert into diary_entries (patient_id, stage, day, answer, answered_at)
+  select id, p_stage, p_day, p_answer, p_answered_at from patients where code = p_code
+  on conflict (patient_id, stage, day)
+  do update set answer = excluded.answer, answered_at = excluded.answered_at;
+$$;
+
+grant execute on function save_diary_entry(text, smallint, smallint, text, timestamptz) to anon;

@@ -519,6 +519,30 @@ function showCompletionModal(stage) {
   document.body.appendChild(overlay);
 }
 
+// Guarda una respuesta usando la función segura de Supabase (funciona sin login).
+// Si la función todavía no existe en la base, usa el método anterior como respaldo.
+async function saveEntries(rows) {
+  let rpcMissing = false;
+  for (const r of rows) {
+    const { error } = await supabase.rpc('save_diary_entry', {
+      p_code: code,
+      p_stage: r.stage,
+      p_day: r.day,
+      p_answer: r.answer,
+      p_answered_at: r.answered_at,
+    });
+    if (error) {
+      if (error.code === 'PGRST202' || /could not find the function/i.test(error.message || '')) {
+        rpcMissing = true;
+        break;
+      }
+      return { error };
+    }
+  }
+  if (!rpcMissing) return { error: null };
+  return supabase.from('diary_entries').upsert(rows, { onConflict: 'patient_id,stage,day' });
+}
+
 async function autoSaveDay(stage, day, answer, indicatorEl, labelEl) {
   if (!answer) return;
 
@@ -530,9 +554,8 @@ async function autoSaveDay(stage, day, answer, indicatorEl, labelEl) {
 
   if (indicatorEl) indicatorEl.textContent = 'Guardando…';
 
-  const { error } = await supabase.from('diary_entries').upsert(
-    [{ patient_id: patient.id, stage: stage.stage, day, answer, answered_at: answeredAt }],
-    { onConflict: 'patient_id,stage,day' }
+  const { error } = await saveEntries(
+    [{ patient_id: patient.id, stage: stage.stage, day, answer, answered_at: answeredAt }]
   );
 
   if (error) {
@@ -696,9 +719,7 @@ function renderStage() {
 
     const wasComplete = stageIsComplete(activeStage);
 
-    const { error } = await supabase
-      .from('diary_entries')
-      .upsert(rows, { onConflict: 'patient_id,stage,day' });
+    const { error } = await saveEntries(rows);
 
     submitBtn.disabled = false;
     submitBtn.textContent = 'Guardar respuestas de esta etapa';
