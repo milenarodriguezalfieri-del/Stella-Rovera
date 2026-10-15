@@ -141,17 +141,19 @@ async function loadPatients() {
 
     const patientUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
     const firstName = capitalizeWords(patient.name).split(' ')[0];
-    const contenido = patient.tracking_type === 'alimentos_habitos'
-      ? 'tu plan alimentario y tus hábitos'
-      : 'tu plan alimentario';
+    const tieneHabitos = patient.tracking_type === 'alimentos_habitos';
     const whatsappMessage = [
       `Hola ${firstName}, te dejo tu espacio personal de Nutrir(se):`,
       patientUrl,
       '',
       'Cómo usarlo:',
       '• Tocá el link y se abre directo, no necesitás usuario ni contraseña.',
-      `• Ahí vas a encontrar ${contenido}.`,
-      '• Lo que escribas se guarda solo.',
+      '• Ahí vas a encontrar tu plan alimentario en dos secciones: "Selección de alimentos" y "Menú semanal".',
+      ...(tieneHabitos
+        ? [
+            '• También tenés una sección de hábitos: es un diario de 21 días donde vas anotando lo que notes. Para entrar, tocá "Ver hábitos" debajo de las dos secciones del plan. Lo que escribas ahí se guarda solo.',
+          ]
+        : []),
       '• Podés volver cuando quieras con el mismo link, así que guardalo.',
     ].join('\n');
 
