@@ -151,7 +151,8 @@ async function loadPatients() {
       '• Ahí vas a encontrar tu plan alimentario en dos secciones: "Selección de alimentos" y "Menú semanal".',
       ...(tieneHabitos
         ? [
-            '• También tenés una sección de hábitos: es un diario de 21 días donde vas anotando lo que notes. Para entrar, tocá "Ver hábitos" debajo de las dos secciones del plan. Lo que escribas ahí se guarda solo.',
+            '• También tenés una sección de hábitos: es un diario de 21 días.',
+            '  Para entrar, tocá “Ver hábitos” debajo de las dos secciones del plan alimentario. Lo que escribas ahí se guarda solo.',
           ]
         : []),
       '• Podés volver cuando quieras con el mismo link, así que guardalo.',
