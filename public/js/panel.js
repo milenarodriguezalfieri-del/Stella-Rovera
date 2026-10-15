@@ -141,7 +141,19 @@ async function loadPatients() {
 
     const patientUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
     const firstName = capitalizeWords(patient.name).split(' ')[0];
-    const whatsappMessage = `Hola ${firstName}, te dejo tu link personal de Nutrir(se): ${patientUrl}`;
+    const contenido = patient.tracking_type === 'alimentos_habitos'
+      ? 'tu plan alimentario y tus hábitos'
+      : 'tu plan alimentario';
+    const whatsappMessage = [
+      `Hola ${firstName}, te dejo tu espacio personal de Nutrir(se):`,
+      patientUrl,
+      '',
+      'Cómo usarlo:',
+      '• Tocá el link y se abre directo, no necesitás usuario ni contraseña.',
+      `• Ahí vas a encontrar ${contenido}.`,
+      '• Lo que escribas se guarda solo.',
+      '• Podés volver cuando quieras con el mismo link, así que guardalo.',
+    ].join('\n');
 
     const copyLinkBtn = document.createElement('button');
     copyLinkBtn.type = 'button';
