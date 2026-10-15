@@ -158,6 +158,17 @@ async function loadPatients() {
       '• Podés volver cuando quieras con el mismo link, así que guardalo.',
     ].join('\n');
 
+    const copyMsgBtn = document.createElement('button');
+    copyMsgBtn.type = 'button';
+    copyMsgBtn.className = 'btn olive-link';
+    copyMsgBtn.textContent = 'Copiar mensaje';
+    copyMsgBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(whatsappMessage);
+      copyMsgBtn.textContent = 'Copiado ✓';
+      setTimeout(() => (copyMsgBtn.textContent = 'Copiar mensaje'), 1500);
+    });
+    linksGroup.appendChild(copyMsgBtn);
+
     const whatsappBtn = document.createElement('button');
     whatsappBtn.type = 'button';
     whatsappBtn.className = 'btn olive-link';
