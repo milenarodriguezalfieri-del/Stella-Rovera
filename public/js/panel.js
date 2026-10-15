@@ -139,31 +139,29 @@ async function loadPatients() {
     const linksGroup = document.createElement('div');
     linksGroup.className = 'row patient-actions-links';
 
-    const copyPlanBtn = document.createElement('button');
-    copyPlanBtn.type = 'button';
-    copyPlanBtn.className = 'btn olive-link';
-    copyPlanBtn.textContent = 'Copiar link Plan alimentario';
-    copyPlanBtn.addEventListener('click', () => {
-      const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=plan`;
-      navigator.clipboard.writeText(shareUrl);
-      copyPlanBtn.textContent = 'Copiado ✓';
-      setTimeout(() => (copyPlanBtn.textContent = 'Copiar link Plan alimentario'), 1500);
-    });
-    linksGroup.appendChild(copyPlanBtn);
+    const patientUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}`;
+    const firstName = capitalizeWords(patient.name).split(' ')[0];
+    const whatsappMessage = `Hola ${firstName}, te dejo tu link personal de Nutrir(se): ${patientUrl}`;
 
-    if (patient.tracking_type === 'alimentos_habitos') {
-      const copyHabitosLinkBtn = document.createElement('button');
-      copyHabitosLinkBtn.type = 'button';
-      copyHabitosLinkBtn.className = 'btn olive-link';
-      copyHabitosLinkBtn.textContent = 'Copiar link Hábitos';
-      copyHabitosLinkBtn.addEventListener('click', () => {
-        const shareUrl = `${window.location.origin}${window.location.pathname.replace('panel.html', 'formulario.html')}?code=${patient.code}&group=habitos`;
-        navigator.clipboard.writeText(shareUrl);
-        copyHabitosLinkBtn.textContent = 'Copiado ✓';
-        setTimeout(() => (copyHabitosLinkBtn.textContent = 'Copiar link Hábitos'), 1500);
-      });
-      linksGroup.appendChild(copyHabitosLinkBtn);
-    }
+    const copyLinkBtn = document.createElement('button');
+    copyLinkBtn.type = 'button';
+    copyLinkBtn.className = 'btn olive-link';
+    copyLinkBtn.textContent = 'Copiar link';
+    copyLinkBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(patientUrl);
+      copyLinkBtn.textContent = 'Copiado ✓';
+      setTimeout(() => (copyLinkBtn.textContent = 'Copiar link'), 1500);
+    });
+    linksGroup.appendChild(copyLinkBtn);
+
+    const whatsappBtn = document.createElement('button');
+    whatsappBtn.type = 'button';
+    whatsappBtn.className = 'btn olive-link';
+    whatsappBtn.textContent = 'Enviar por WhatsApp';
+    whatsappBtn.addEventListener('click', () => {
+      window.open(`https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+    });
+    linksGroup.appendChild(whatsappBtn);
 
     actions.appendChild(linksGroup);
 
