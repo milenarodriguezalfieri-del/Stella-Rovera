@@ -405,10 +405,12 @@ textarea { resize: vertical; min-height: 80px; }
     flex-direction: column;
     gap: 14px;
   }
-  .stage-card {
+  .stage-card,
+  .stage-select-card {
     order: 3;
   }
-  .stage-card.active-stage-card {
+  .stage-card.active-stage-card,
+  .stage-select-card.active-stage-card {
     order: 1;
   }
   .stage-headline {
