@@ -165,6 +165,7 @@ async function loadPatients() {
     const secondaryActions = document.createElement('div');
     secondaryActions.className = 'row';
     secondaryActions.style.gap = '6px';
+    secondaryActions.style.width = '100%';
 
     const printBtn = document.createElement('button');
     printBtn.type = 'button';
@@ -204,6 +205,7 @@ async function loadPatients() {
       const addHabitosBtn = document.createElement('button');
       addHabitosBtn.type = 'button';
       addHabitosBtn.className = 'btn ghost';
+      addHabitosBtn.style.marginLeft = 'auto';
       addHabitosBtn.textContent = 'Agregar hábitos';
       addHabitosBtn.addEventListener('click', async () => {
         const ok = confirm(`¿Querés agregar el seguimiento de hábitos a ${capitalizeWords(patient.name)}?`);
