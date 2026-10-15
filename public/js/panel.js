@@ -158,6 +158,26 @@ async function loadPatients() {
         window.location.href = `paciente.html?id=${patient.id}&section=habitos`;
       });
       editGroup.appendChild(habitosBtn);
+    } else {
+      const addHabitosBtn = document.createElement('button');
+      addHabitosBtn.type = 'button';
+      addHabitosBtn.className = 'btn secondary btn-sm';
+      addHabitosBtn.textContent = 'Agregar hábitos';
+      addHabitosBtn.addEventListener('click', async () => {
+        const ok = confirm(`¿Querés agregar el seguimiento de hábitos a ${capitalizeWords(patient.name)}?`);
+        if (!ok) return;
+        addHabitosBtn.disabled = true;
+        addHabitosBtn.textContent = 'Agregando…';
+        const { error } = await supabase.from('patients').update({ tracking_type: 'alimentos_habitos' }).eq('id', patient.id);
+        if (error) {
+          alert('No se pudo agregar hábitos. Probá de nuevo.');
+          addHabitosBtn.disabled = false;
+          addHabitosBtn.textContent = 'Agregar hábitos';
+          return;
+        }
+        loadPatients();
+      });
+      editGroup.appendChild(addHabitosBtn);
     }
 
     actions.appendChild(editGroup);

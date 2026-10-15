@@ -125,9 +125,23 @@ function renderSectionTabs() {
   const habitosBtn = document.createElement('button');
   habitosBtn.type = 'button';
   habitosBtn.className = 'btn' + (activeSection === 'habitos' ? '' : ' secondary');
-  habitosBtn.textContent = 'Hábitos';
-  habitosBtn.disabled = patientTrackingType !== 'alimentos_habitos';
-  habitosBtn.addEventListener('click', () => setActiveSection('habitos'));
+  const hasHabitos = patientTrackingType === 'alimentos_habitos';
+  habitosBtn.textContent = hasHabitos ? 'Hábitos' : 'Agregar hábitos';
+  habitosBtn.addEventListener('click', async () => {
+    if (hasHabitos) {
+      setActiveSection('habitos');
+      return;
+    }
+    if (!confirm('¿Querés agregar el seguimiento de hábitos a esta paciente?')) return;
+    habitosBtn.disabled = true;
+    const { error } = await supabase.from('patients').update({ tracking_type: 'alimentos_habitos' }).eq('id', patientId);
+    if (error) {
+      alert('No se pudo agregar hábitos. Probá de nuevo.');
+      habitosBtn.disabled = false;
+      return;
+    }
+    window.location.href = `paciente.html?id=${patientId}&section=habitos`;
+  });
   el.sectionTabs.appendChild(habitosBtn);
 }
 
